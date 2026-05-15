@@ -93,7 +93,9 @@ function SplashScreen() {
     return () => clearTimeout(t);
   }, [navigate]);
 
+  return (
     <main className="splash-root">
+
       <div className="splash-glow splash-glow-warm" aria-hidden="true" />
       <div className="splash-glow splash-glow-green" aria-hidden="true" />
       <div className="splash-glow splash-glow-soft" aria-hidden="true" />
