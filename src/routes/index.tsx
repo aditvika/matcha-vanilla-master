@@ -87,7 +87,12 @@ function HeartSpark() {
 }
 
 function SplashScreen() {
-  return (
+  const navigate = useNavigate();
+  useEffect(() => {
+    const t = setTimeout(() => navigate({ to: "/home" }), 2600);
+    return () => clearTimeout(t);
+  }, [navigate]);
+
     <main className="splash-root">
       <div className="splash-glow splash-glow-warm" aria-hidden="true" />
       <div className="splash-glow splash-glow-green" aria-hidden="true" />
