@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,8 +87,15 @@ function HeartSpark() {
 }
 
 function SplashScreen() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const t = setTimeout(() => navigate({ to: "/home" }), 2600);
+    return () => clearTimeout(t);
+  }, [navigate]);
+
   return (
     <main className="splash-root">
+
       <div className="splash-glow splash-glow-warm" aria-hidden="true" />
       <div className="splash-glow splash-glow-green" aria-hidden="true" />
       <div className="splash-glow splash-glow-soft" aria-hidden="true" />
