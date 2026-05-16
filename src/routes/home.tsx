@@ -190,6 +190,27 @@ function HomePage() {
         </Link>
       </nav>
 
+      {/* Face Swap — Coming Soon modal */}
+      <Dialog open={faceSwapOpen} onOpenChange={setFaceSwapOpen}>
+        <DialogContent className="coming-soon-dialog-content">
+          <DialogHeader>
+            <DialogTitle className="coming-soon-dialog-title">Coming Soon!</DialogTitle>
+            <DialogDescription className="coming-soon-dialog-desc">
+              We will bring this feature to you very soon.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              type="button"
+              className="coming-soon-dialog-btn"
+              onClick={() => setFaceSwapOpen(false)}
+            >
+              Got it
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Notifications bottom sheet */}
       <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
         <DrawerContent className="notif-sheet">
