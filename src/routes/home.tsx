@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Bell,
@@ -10,7 +11,17 @@ import {
   Settings,
   Sparkles,
   ChevronRight,
+  CheckCircle2,
+  Crown,
+  Gift,
 } from "lucide-react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from "@/components/ui/drawer";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -37,7 +48,51 @@ const services: Service[] = [
   { label: "Project History", Icon: FolderOpen },
 ];
 
+type Notification = {
+  id: string;
+  Icon: typeof Wand2;
+  title: string;
+  body: string;
+  time: string;
+  tone: "success" | "premium" | "info";
+};
+
+const notifications: Notification[] = [
+  {
+    id: "1",
+    Icon: CheckCircle2,
+    title: "Your video upscale is complete!",
+    body: "Tap to preview the 4K render and download.",
+    time: "2m ago",
+    tone: "success",
+  },
+  {
+    id: "2",
+    Icon: Crown,
+    title: "Unlock 4K exports with Premium",
+    body: "Go pro to remove watermarks and queue limits.",
+    time: "1h ago",
+    tone: "premium",
+  },
+  {
+    id: "3",
+    Icon: Gift,
+    title: "New: Face Swap v2 is live",
+    body: "Sharper edges, better blending, faster results.",
+    time: "Yesterday",
+    tone: "info",
+  },
+];
+
 function HomePage() {
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(true);
+
+  const openNotifications = () => {
+    setNotifOpen(true);
+    setHasUnread(false);
+  };
+
   return (
     <main className="home-root">
       <div className="home-glow home-glow-green" aria-hidden />
@@ -50,9 +105,14 @@ function HomePage() {
             <p className="home-greet-eyebrow">Welcome back</p>
             <h1 className="home-greet">Hello, User!</h1>
           </div>
-          <button className="home-bell" aria-label="Notifications" type="button">
+          <button
+            className="home-bell"
+            aria-label="Notifications"
+            type="button"
+            onClick={openNotifications}
+          >
             <Bell size={20} />
-            <span className="home-bell-dot" aria-hidden />
+            {hasUnread && <span className="home-bell-dot" aria-hidden />}
           </button>
         </header>
 
@@ -107,6 +167,33 @@ function HomePage() {
           <span>Settings</span>
         </Link>
       </nav>
+
+      {/* Notifications bottom sheet */}
+      <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
+        <DrawerContent className="notif-sheet">
+          <DrawerHeader className="notif-sheet-header">
+            <DrawerTitle className="notif-sheet-title">Notifications</DrawerTitle>
+            <DrawerDescription className="notif-sheet-sub">
+              Updates from your AI studio
+            </DrawerDescription>
+          </DrawerHeader>
+          <ul className="notif-list">
+            {notifications.map(({ id, Icon, title, body, time, tone }) => (
+              <li key={id} className="notif-item">
+                <div className={`notif-icon notif-icon-${tone}`}>
+                  <Icon size={18} />
+                </div>
+                <div className="notif-text">
+                  <p className="notif-title">{title}</p>
+                  <p className="notif-body">{body}</p>
+                </div>
+                <span className="notif-time">{time}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="notif-sheet-foot" />
+        </DrawerContent>
+      </Drawer>
     </main>
   );
 }
