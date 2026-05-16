@@ -155,14 +155,22 @@ function HomePage() {
 
       {/* Bottom nav */}
       <nav className="home-nav" aria-label="Primary">
-        <Link to="/home" className="home-nav-item home-nav-active">
+        <Link
+          to="/home"
+          className="home-nav-item"
+          activeProps={{ className: "home-nav-item home-nav-active" }}
+        >
           <HomeIcon size={22} />
           <span>Home</span>
         </Link>
         <Link to="/home" className="home-nav-item home-nav-create">
           <Plus size={26} />
         </Link>
-        <Link to="/home" className="home-nav-item">
+        <Link
+          to="/settings"
+          className="home-nav-item"
+          activeProps={{ className: "home-nav-item home-nav-active" }}
+        >
           <Settings size={22} />
           <span>Settings</span>
         </Link>
