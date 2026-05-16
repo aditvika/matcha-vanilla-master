@@ -95,6 +95,7 @@ const notifications: Notification[] = [
 function HomePage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
+  const [faceSwapOpen, setFaceSwapOpen] = useState(false);
 
   const openNotifications = () => {
     setNotifOpen(true);
