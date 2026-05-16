@@ -151,7 +151,12 @@ function HomePage() {
           </div>
           <div className="home-grid">
             {services.map(({ label, Icon }) => (
-              <button key={label} type="button" className="home-card">
+              <button
+                key={label}
+                type="button"
+                className="home-card"
+                onClick={label === "Face Swap" ? () => setFaceSwapOpen(true) : undefined}
+              >
                 <div className="home-card-icon">
                   <Icon size={24} />
                 </div>
