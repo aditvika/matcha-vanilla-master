@@ -16,6 +16,14 @@ import {
   Gift,
 } from "lucide-react";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   Drawer,
   DrawerContent,
   DrawerHeader,
@@ -87,6 +95,7 @@ const notifications: Notification[] = [
 function HomePage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
+  const [faceSwapOpen, setFaceSwapOpen] = useState(false);
 
   const openNotifications = () => {
     setNotifOpen(true);
@@ -142,7 +151,12 @@ function HomePage() {
           </div>
           <div className="home-grid">
             {services.map(({ label, Icon }) => (
-              <button key={label} type="button" className="home-card">
+              <button
+                key={label}
+                type="button"
+                className="home-card"
+                onClick={label === "Face Swap" ? () => setFaceSwapOpen(true) : undefined}
+              >
                 <div className="home-card-icon">
                   <Icon size={24} />
                 </div>
@@ -175,6 +189,27 @@ function HomePage() {
           <span>Settings</span>
         </Link>
       </nav>
+
+      {/* Face Swap — Coming Soon modal */}
+      <Dialog open={faceSwapOpen} onOpenChange={setFaceSwapOpen}>
+        <DialogContent className="coming-soon-dialog-content">
+          <DialogHeader>
+            <DialogTitle className="coming-soon-dialog-title">Coming Soon!</DialogTitle>
+            <DialogDescription className="coming-soon-dialog-desc">
+              We will bring this feature to you very soon.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              type="button"
+              className="coming-soon-dialog-btn"
+              onClick={() => setFaceSwapOpen(false)}
+            >
+              Got it
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Notifications bottom sheet */}
       <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
