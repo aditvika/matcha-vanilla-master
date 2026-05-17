@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   UserCircle2,
   Crown,
@@ -16,6 +16,8 @@ import {
   Zap,
   BadgeCheck,
   ExternalLink,
+  LogIn,
+  Mail,
 } from "lucide-react";
 import {
   Drawer,
