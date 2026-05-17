@@ -58,9 +58,47 @@ const LANGUAGES = [
 
 function SettingsPage() {
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
-  const [name, setName] = useState("Matcha User");
+  const [name, setName] = useState<string>(() => {
+    if (typeof window === "undefined") return "Matcha User";
+    return localStorage.getItem("mv:profile:name") || "Matcha User";
+  });
+  const [avatar, setAvatar] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("mv:profile:avatar");
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("mv:auth:loggedIn") === "1";
+  });
+  const userEmail = isLoggedIn
+    ? localStorage.getItem("mv:auth:email") || "user@matchavanilla.app"
+    : "";
   const [language, setLanguage] = useState("en-US");
   const isPremium = false;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    localStorage.setItem("mv:profile:name", name);
+  }, [name]);
+  useEffect(() => {
+    if (avatar) localStorage.setItem("mv:profile:avatar", avatar);
+    else localStorage.removeItem("mv:profile:avatar");
+  }, [avatar]);
+
+  const handleAvatarPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setAvatar(typeof reader.result === "string" ? reader.result : null);
+    reader.readAsDataURL(file);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("mv:auth:loggedIn");
+    localStorage.removeItem("mv:auth:email");
+    setIsLoggedIn(false);
+    setOpenSheet(null);
+  };
 
   const currentLangLabel = LANGUAGES.find((l) => l.code === language)?.label ?? "English (US)";
 
