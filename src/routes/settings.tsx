@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   UserCircle2,
   Crown,
@@ -16,6 +16,8 @@ import {
   Zap,
   BadgeCheck,
   ExternalLink,
+  LogIn,
+  Mail,
 } from "lucide-react";
 import {
   Drawer,
@@ -56,9 +58,47 @@ const LANGUAGES = [
 
 function SettingsPage() {
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
-  const [name, setName] = useState("Matcha User");
+  const [name, setName] = useState<string>(() => {
+    if (typeof window === "undefined") return "Matcha User";
+    return localStorage.getItem("mv:profile:name") || "Matcha User";
+  });
+  const [avatar, setAvatar] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("mv:profile:avatar");
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("mv:auth:loggedIn") === "1";
+  });
+  const userEmail = isLoggedIn
+    ? localStorage.getItem("mv:auth:email") || "user@matchavanilla.app"
+    : "";
   const [language, setLanguage] = useState("en-US");
   const isPremium = false;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    localStorage.setItem("mv:profile:name", name);
+  }, [name]);
+  useEffect(() => {
+    if (avatar) localStorage.setItem("mv:profile:avatar", avatar);
+    else localStorage.removeItem("mv:profile:avatar");
+  }, [avatar]);
+
+  const handleAvatarPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setAvatar(typeof reader.result === "string" ? reader.result : null);
+    reader.readAsDataURL(file);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("mv:auth:loggedIn");
+    localStorage.removeItem("mv:auth:email");
+    setIsLoggedIn(false);
+    setOpenSheet(null);
+  };
 
   const currentLangLabel = LANGUAGES.find((l) => l.code === language)?.label ?? "English (US)";
 
@@ -174,12 +214,37 @@ function SettingsPage() {
 
           <div className="settings-sheet-body">
             <div className="profile-avatar-wrap">
-              <div className="profile-avatar" aria-hidden>
+              <div
+                className="profile-avatar"
+                aria-hidden
+                style={
+                  avatar
+                    ? {
+                        backgroundImage: `url(${avatar})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        color: "transparent",
+                      }
+                    : undefined
+                }
+              >
                 {name.charAt(0).toUpperCase()}
               </div>
-              <button type="button" className="profile-avatar-edit" aria-label="Change avatar">
+              <button
+                type="button"
+                className="profile-avatar-edit"
+                aria-label="Change avatar"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 <Camera size={16} />
               </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={handleAvatarPick}
+              />
             </div>
 
             <div className="profile-field">
@@ -189,17 +254,24 @@ function SettingsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="profile-input"
+                placeholder="Your name"
               />
             </div>
 
             <div className="profile-field">
-              <Label htmlFor="profile-email" className="profile-label">Email</Label>
-              <Input
-                id="profile-email"
-                value="user@matchavanilla.app"
-                readOnly
-                className="profile-input profile-input-readonly"
-              />
+              <Label className="profile-label">Account</Label>
+              {isLoggedIn ? (
+                <div className="profile-email-display">
+                  <Mail size={16} />
+                  <span>{userEmail}</span>
+                  <BadgeCheck size={16} className="profile-email-verified" />
+                </div>
+              ) : (
+                <a href="/login" className="profile-link-account">
+                  <LogIn size={18} />
+                  <span>Log In / Link Account</span>
+                </a>
+              )}
             </div>
           </div>
 
@@ -211,6 +283,16 @@ function SettingsPage() {
             >
               Save Changes
             </button>
+            {isLoggedIn && (
+              <button
+                type="button"
+                className="profile-logout-btn"
+                onClick={handleLogout}
+              >
+                <LogOut size={16} />
+                <span>Log Out</span>
+              </button>
+            )}
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
