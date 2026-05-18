@@ -244,6 +244,9 @@ function HomePage() {
           <div className="notif-sheet-foot" />
         </DrawerContent>
       </Drawer>
+
+      {/* Premium notification modal */}
+      <PremiumModal open={premiumOpen} onOpenChange={setPremiumOpen} />
     </main>
   );
 }
