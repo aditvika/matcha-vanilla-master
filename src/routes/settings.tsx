@@ -12,10 +12,6 @@ import {
   Settings as SettingsIcon,
   Camera,
   Check,
-  Sparkles,
-  Zap,
-  BadgeCheck,
-  ExternalLink,
   Mail,
 } from "lucide-react";
 import {
@@ -37,6 +33,7 @@ import {
   signInWithGoogle,
   completeEmailLinkSignInIfPresent,
 } from "@/lib/firebase";
+import { PremiumModal } from "@/components/premium-modal";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
