@@ -37,6 +37,7 @@ import {
   signInWithGoogle,
   completeEmailLinkSignInIfPresent,
 } from "@/lib/firebase";
+import { PremiumModal } from "@/components/premium-modal";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -65,6 +66,7 @@ const LANGUAGES = [
 
 function SettingsPage() {
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
+  const [premiumOpen, setPremiumOpen] = useState(false);
   const [name, setName] = useState<string>(() => {
     if (typeof window === "undefined") return "Matcha User";
     return localStorage.getItem("mv:profile:name") || "Matcha User";
@@ -179,7 +181,7 @@ function SettingsPage() {
       label: "Manage Premium Subscription",
       desc: isPremium ? "Premium Active" : "Free Plan",
       Icon: Crown,
-      onClick: () => setOpenSheet("premium"),
+      onClick: () => setPremiumOpen(true),
     },
     {
       label: "Language",
@@ -397,66 +399,8 @@ function SettingsPage() {
         </DrawerContent>
       </Drawer>
 
-      {/* Premium Sheet */}
-      <Drawer open={openSheet === "premium"} onOpenChange={(o) => !o && setOpenSheet(null)}>
-        <DrawerContent className="settings-sheet">
-          <DrawerHeader className="settings-sheet-header">
-            <DrawerTitle className="settings-sheet-title">Premium Subscription</DrawerTitle>
-            <DrawerDescription className="settings-sheet-desc">
-              {isPremium ? "You're on the Premium plan" : "You're on the Free plan"}
-            </DrawerDescription>
-          </DrawerHeader>
-
-          <div className="settings-sheet-body">
-            <div className="premium-status">
-              <div className="premium-status-icon">
-                <Crown size={20} />
-              </div>
-              <div>
-                <p className="premium-status-label">Current Plan</p>
-                <p className="premium-status-value">
-                  {isPremium ? "Premium Active" : "Free Plan"}
-                </p>
-              </div>
-            </div>
-
-            <div className="premium-card">
-              <div className="premium-card-header">
-                <Sparkles size={18} />
-                <span>MVMaster Premium</span>
-              </div>
-              <ul className="premium-benefits">
-                <li>
-                  <BadgeCheck size={16} />
-                  <span>HD Photo & Video Enhancement</span>
-                </li>
-                <li>
-                  <BadgeCheck size={16} />
-                  <span>No Ads, ever</span>
-                </li>
-                <li>
-                  <Zap size={16} />
-                  <span>Faster Processing Queue</span>
-                </li>
-                <li>
-                  <BadgeCheck size={16} />
-                  <span>4K Export & Priority Support</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <DrawerFooter className="settings-sheet-footer">
-            <button
-              type="button"
-              className="settings-sheet-primary"
-              onClick={() => setOpenSheet(null)}
-            >
-              {isPremium ? "Manage Subscription" : "Upgrade to Premium"}
-            </button>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+      {/* Premium Notification Modal */}
+      <PremiumModal open={premiumOpen} onOpenChange={setPremiumOpen} />
 
       {/* Language Sheet */}
       <Drawer open={openSheet === "language"} onOpenChange={(o) => !o && setOpenSheet(null)}>

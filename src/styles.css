@@ -1055,3 +1055,75 @@
 }
 .profile-google-btn:hover:not(:disabled) { background: oklch(0.98 0 0); }
 .profile-google-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ===== Premium Notification Modal ===== */
+.premium-modal-content {
+  background: linear-gradient(135deg, oklch(0.22 0.025 240), oklch(0.16 0.02 240)) !important;
+  border: 1px solid oklch(1 0 0 / 0.1) !important;
+  border-radius: 1.25rem !important;
+  color: oklch(0.96 0.005 90);
+  max-width: 480px !important;
+  max-height: 85vh;
+  padding: 1.5rem !important;
+  gap: 1rem !important;
+  overflow-y: auto;
+}
+.premium-modal-title {
+  color: oklch(0.97 0.005 90);
+  font-size: 1.15rem;
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+.premium-modal-desc {
+  color: oklch(0.8 0.01 240);
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+.premium-modal-desc > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.premium-modal-line {
+  margin: 0;
+}
+.premium-modal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.premium-modal-list li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+.premium-modal-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: oklch(0.75 0.16 145);
+  font-weight: 700;
+}
+.premium-modal-signature {
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: oklch(0.7 0.02 240);
+  font-size: 0.85rem;
+}
+.premium-modal-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, oklch(0.75 0.16 145), oklch(0.6 0.14 160));
+  color: oklch(0.18 0.02 240);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.premium-modal-btn:hover { opacity: 0.92; }
+.premium-modal-btn:active { transform: scale(0.98); }

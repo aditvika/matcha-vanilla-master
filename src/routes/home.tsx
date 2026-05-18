@@ -30,6 +30,7 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from "@/components/ui/drawer";
+import { PremiumModal } from "@/components/premium-modal";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -96,6 +97,7 @@ function HomePage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
   const [faceSwapOpen, setFaceSwapOpen] = useState(false);
+  const [premiumOpen, setPremiumOpen] = useState(false);
 
   const openNotifications = () => {
     setNotifOpen(true);
@@ -126,7 +128,12 @@ function HomePage() {
         </header>
 
         {/* Featured glass card */}
-        <section className="home-featured" aria-label="MVMaster Premium">
+        <button
+          type="button"
+          className="home-featured"
+          aria-label="MVMaster Premium"
+          onClick={() => setPremiumOpen(true)}
+        >
           <div className="home-featured-glow" aria-hidden />
           <div className="home-featured-row">
             <div className="home-featured-icon">
@@ -141,7 +148,7 @@ function HomePage() {
             </div>
             <ChevronRight size={20} className="home-featured-chev" />
           </div>
-        </section>
+        </button>
 
         {/* Service grid */}
         <section className="home-section" aria-label="Services">
@@ -237,6 +244,9 @@ function HomePage() {
           <div className="notif-sheet-foot" />
         </DrawerContent>
       </Drawer>
+
+      {/* Premium notification modal */}
+      <PremiumModal open={premiumOpen} onOpenChange={setPremiumOpen} />
     </main>
   );
 }
