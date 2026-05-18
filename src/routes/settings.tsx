@@ -181,7 +181,7 @@ function SettingsPage() {
       label: "Manage Premium Subscription",
       desc: isPremium ? "Premium Active" : "Free Plan",
       Icon: Crown,
-      onClick: () => setOpenSheet("premium"),
+      onClick: () => setPremiumOpen(true),
     },
     {
       label: "Language",
