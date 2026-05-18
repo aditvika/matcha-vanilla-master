@@ -16,7 +16,7 @@ import {
   Zap,
   BadgeCheck,
   ExternalLink,
-  LogIn,
+  Mail,
   Mail,
 } from "lucide-react";
 import {
