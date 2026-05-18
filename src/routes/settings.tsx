@@ -12,6 +12,10 @@ import {
   Settings as SettingsIcon,
   Camera,
   Check,
+  Sparkles,
+  Zap,
+  BadgeCheck,
+  ExternalLink,
   Mail,
 } from "lucide-react";
 import {
