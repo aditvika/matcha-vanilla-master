@@ -128,7 +128,12 @@ function HomePage() {
         </header>
 
         {/* Featured glass card */}
-        <section className="home-featured" aria-label="MVMaster Premium">
+        <button
+          type="button"
+          className="home-featured"
+          aria-label="MVMaster Premium"
+          onClick={() => setPremiumOpen(true)}
+        >
           <div className="home-featured-glow" aria-hidden />
           <div className="home-featured-row">
             <div className="home-featured-icon">
@@ -143,7 +148,7 @@ function HomePage() {
             </div>
             <ChevronRight size={20} className="home-featured-chev" />
           </div>
-        </section>
+        </button>
 
         {/* Service grid */}
         <section className="home-section" aria-label="Services">
