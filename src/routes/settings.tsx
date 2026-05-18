@@ -30,6 +30,14 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  auth,
+  sendMagicLink,
+  signInWithGoogle,
+  completeEmailLinkSignInIfPresent,
+} from "@/lib/firebase";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
