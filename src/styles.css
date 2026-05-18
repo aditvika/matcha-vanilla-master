@@ -996,3 +996,62 @@
   transition: background 0.2s ease;
 }
 .profile-logout-btn:hover { background: oklch(0.4 0.15 25 / 0.18); }
+
+.profile-magic-link-btn {
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.85rem;
+  background: linear-gradient(135deg, oklch(0.75 0.16 145 / 0.18), oklch(0.6 0.14 160 / 0.12));
+  border: 1px solid oklch(0.75 0.16 145 / 0.35);
+  color: oklch(0.95 0.02 145);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+.profile-magic-link-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, oklch(0.75 0.16 145 / 0.28), oklch(0.6 0.14 160 / 0.2));
+}
+.profile-magic-link-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.profile-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: oklch(0.65 0.02 240);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0.25rem 0;
+}
+.profile-divider::before,
+.profile-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: oklch(1 0 0 / 0.08);
+}
+
+.profile-google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  background: oklch(1 0 0 / 0.96);
+  color: oklch(0.2 0.02 240);
+  border: 1px solid oklch(1 0 0 / 0.18);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+.profile-google-btn:hover:not(:disabled) { background: oklch(0.98 0 0); }
+.profile-google-btn:disabled { opacity: 0.6; cursor: not-allowed; }

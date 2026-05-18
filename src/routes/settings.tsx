@@ -16,7 +16,6 @@ import {
   Zap,
   BadgeCheck,
   ExternalLink,
-  LogIn,
   Mail,
 } from "lucide-react";
 import {
@@ -30,6 +29,14 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import {
+  auth,
+  sendMagicLink,
+  signInWithGoogle,
+  completeEmailLinkSignInIfPresent,
+} from "@/lib/firebase";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -66,13 +73,11 @@ function SettingsPage() {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("mv:profile:avatar");
   });
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("mv:auth:loggedIn") === "1";
-  });
-  const userEmail = isLoggedIn
-    ? localStorage.getItem("mv:auth:email") || "user@matchavanilla.app"
-    : "";
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [emailInput, setEmailInput] = useState<string>("");
+  const [sendingLink, setSendingLink] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [language, setLanguage] = useState("en-US");
   const isPremium = false;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,6 +90,23 @@ function SettingsPage() {
     else localStorage.removeItem("mv:profile:avatar");
   }, [avatar]);
 
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        setUserEmail(user.email ?? "");
+      } else {
+        setIsLoggedIn(false);
+        setUserEmail("");
+      }
+    });
+    completeEmailLinkSignInIfPresent().catch((err) => {
+      console.error(err);
+      toast.error("Could not complete email sign-in");
+    });
+    return () => unsub();
+  }, []);
+
   const handleAvatarPick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -93,11 +115,49 @@ function SettingsPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("mv:auth:loggedIn");
-    localStorage.removeItem("mv:auth:email");
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success("Signed out");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to sign out");
+    }
     setOpenSheet(null);
+  };
+
+  const handleSendMagicLink = async () => {
+    const email = emailInput.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    setSendingLink(true);
+    try {
+      await sendMagicLink(email);
+      toast.success("Magic link sent! Check your inbox.");
+      setEmailInput("");
+    } catch (err: unknown) {
+      console.error(err);
+      const message = err instanceof Error ? err.message : "Failed to send link";
+      toast.error(message);
+    } finally {
+      setSendingLink(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const user = await signInWithGoogle();
+      toast.success(`Welcome ${user.displayName ?? user.email ?? ""}`);
+    } catch (err: unknown) {
+      console.error(err);
+      const message = err instanceof Error ? err.message : "Google sign-in failed";
+      toast.error(message);
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   const currentLangLabel = LANGUAGES.find((l) => l.code === language)?.label ?? "English (US)";
@@ -258,21 +318,61 @@ function SettingsPage() {
               />
             </div>
 
-            <div className="profile-field">
-              <Label className="profile-label">Account</Label>
-              {isLoggedIn ? (
+            {isLoggedIn ? (
+              <div className="profile-field">
+                <Label className="profile-label">Account</Label>
                 <div className="profile-email-display">
                   <Mail size={16} />
                   <span>{userEmail}</span>
                   <BadgeCheck size={16} className="profile-email-verified" />
                 </div>
-              ) : (
-                <a href="/login" className="profile-link-account">
-                  <LogIn size={18} />
-                  <span>Log In / Link Account</span>
-                </a>
-              )}
-            </div>
+              </div>
+            ) : (
+              <>
+                <div className="profile-field">
+                  <Label htmlFor="profile-email" className="profile-label">
+                    Email Address
+                  </Label>
+                  <Input
+                    id="profile-email"
+                    type="email"
+                    autoComplete="email"
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    className="profile-input"
+                    placeholder="you@example.com"
+                  />
+                  <button
+                    type="button"
+                    className="profile-magic-link-btn"
+                    onClick={handleSendMagicLink}
+                    disabled={sendingLink}
+                  >
+                    <Mail size={16} />
+                    <span>{sendingLink ? "Sending..." : "Send Verification Link"}</span>
+                  </button>
+                </div>
+
+                <div className="profile-divider">
+                  <span>or</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="profile-google-btn"
+                  onClick={handleGoogleSignIn}
+                  disabled={googleLoading}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.24 1.4-1.7 4.1-5.5 4.1-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z"/>
+                    <path fill="#4285F4" d="M21.2 12.2c0-.6-.1-1.1-.2-1.6H12v3.9h5.5c-.24 1.4-1.7 4.1-5.5 4.1v.1l3.6 2.8c2.1-2 3.6-4.9 3.6-9.3z"/>
+                    <path fill="#FBBC05" d="M5.4 14.3l-.7.5-2.3 1.8C3.9 19.9 7.7 22 12 22c2.6 0 4.8-.9 6.4-2.3l-3.6-2.8c-1 .7-2.3 1.2-2.8 1.2-2.6 0-4.8-1.7-5.6-4.1z"/>
+                    <path fill="#34A853" d="M12 21.6c2.6 0 4.8-.9 6.4-2.3l-3.6-2.8c-1 .7-2.3 1.1-2.8 1.1-2.6 0-4.8-1.7-5.6-4.1l-3 2.3C5 19.5 8.2 21.6 12 21.6z"/>
+                  </svg>
+                  <span>{googleLoading ? "Connecting..." : "Continue with Google"}</span>
+                </button>
+              </>
+            )}
           </div>
 
           <DrawerFooter className="settings-sheet-footer">
