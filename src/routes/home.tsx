@@ -30,6 +30,7 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from "@/components/ui/drawer";
+import { PremiumModal } from "@/components/premium-modal";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
