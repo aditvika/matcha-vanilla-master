@@ -74,13 +74,11 @@ function SettingsPage() {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("mv:profile:avatar");
   });
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("mv:auth:loggedIn") === "1";
-  });
-  const userEmail = isLoggedIn
-    ? localStorage.getItem("mv:auth:email") || "user@matchavanilla.app"
-    : "";
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [emailInput, setEmailInput] = useState<string>("");
+  const [sendingLink, setSendingLink] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [language, setLanguage] = useState("en-US");
   const isPremium = false;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,6 +91,23 @@ function SettingsPage() {
     else localStorage.removeItem("mv:profile:avatar");
   }, [avatar]);
 
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        setUserEmail(user.email ?? "");
+      } else {
+        setIsLoggedIn(false);
+        setUserEmail("");
+      }
+    });
+    completeEmailLinkSignInIfPresent().catch((err) => {
+      console.error(err);
+      toast.error("Could not complete email sign-in");
+    });
+    return () => unsub();
+  }, []);
+
   const handleAvatarPick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -101,11 +116,49 @@ function SettingsPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("mv:auth:loggedIn");
-    localStorage.removeItem("mv:auth:email");
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success("Signed out");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to sign out");
+    }
     setOpenSheet(null);
+  };
+
+  const handleSendMagicLink = async () => {
+    const email = emailInput.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    setSendingLink(true);
+    try {
+      await sendMagicLink(email);
+      toast.success("Magic link sent! Check your inbox.");
+      setEmailInput("");
+    } catch (err: unknown) {
+      console.error(err);
+      const message = err instanceof Error ? err.message : "Failed to send link";
+      toast.error(message);
+    } finally {
+      setSendingLink(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const user = await signInWithGoogle();
+      toast.success(`Welcome ${user.displayName ?? user.email ?? ""}`);
+    } catch (err: unknown) {
+      console.error(err);
+      const message = err instanceof Error ? err.message : "Google sign-in failed";
+      toast.error(message);
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   const currentLangLabel = LANGUAGES.find((l) => l.code === language)?.label ?? "English (US)";
