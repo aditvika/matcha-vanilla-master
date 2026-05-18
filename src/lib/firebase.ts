@@ -26,7 +26,7 @@ export const EMAIL_LINK_STORAGE_KEY = "mv:auth:emailForSignIn";
 
 export async function sendMagicLink(email: string) {
   const actionCodeSettings = {
-    url: `${window.location.origin}/settings?emailLink=1`,
+    url: "https://id-preview--794be7d5-4f92-4ab6-8751-1e17f99cf4c2.lovable.app/settings?emailLink=1",
     handleCodeInApp: true,
   };
   await sendSignInLinkToEmail(auth, email, actionCodeSettings);
