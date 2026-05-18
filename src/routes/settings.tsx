@@ -17,7 +17,6 @@ import {
   BadgeCheck,
   ExternalLink,
   Mail,
-  Mail,
 } from "lucide-react";
 import {
   Drawer,
