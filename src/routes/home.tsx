@@ -99,6 +99,7 @@ function HomePage() {
   const [hasUnread, setHasUnread] = useState(true);
   const [faceSwapOpen, setFaceSwapOpen] = useState(false);
   const [premiumOpen, setPremiumOpen] = useState(false);
+  const [subOpen, setSubOpen] = useState(false);
 
   const openNotifications = () => {
     setNotifOpen(true);
@@ -247,7 +248,14 @@ function HomePage() {
       </Drawer>
 
       {/* Premium notification modal */}
-      <PremiumModal open={premiumOpen} onOpenChange={setPremiumOpen} />
+      <PremiumModal
+        open={premiumOpen}
+        onOpenChange={setPremiumOpen}
+        onUnderstand={() => setSubOpen(true)}
+      />
+
+      {/* Subscription plans modal */}
+      <SubscriptionModal open={subOpen} onOpenChange={setSubOpen} />
     </main>
   );
 }
