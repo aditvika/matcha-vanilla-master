@@ -31,6 +31,7 @@ import {
   DrawerDescription,
 } from "@/components/ui/drawer";
 import { PremiumModal } from "@/components/premium-modal";
+import { SubscriptionModal } from "@/components/subscription-modal";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -98,6 +99,7 @@ function HomePage() {
   const [hasUnread, setHasUnread] = useState(true);
   const [faceSwapOpen, setFaceSwapOpen] = useState(false);
   const [premiumOpen, setPremiumOpen] = useState(false);
+  const [subOpen, setSubOpen] = useState(false);
 
   const openNotifications = () => {
     setNotifOpen(true);
@@ -246,7 +248,14 @@ function HomePage() {
       </Drawer>
 
       {/* Premium notification modal */}
-      <PremiumModal open={premiumOpen} onOpenChange={setPremiumOpen} />
+      <PremiumModal
+        open={premiumOpen}
+        onOpenChange={setPremiumOpen}
+        onUnderstand={() => setTimeout(() => setSubOpen(true), 250)}
+      />
+
+      {/* Subscription plans modal */}
+      <SubscriptionModal open={subOpen} onOpenChange={setSubOpen} />
     </main>
   );
 }

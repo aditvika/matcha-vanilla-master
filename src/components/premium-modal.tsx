@@ -7,7 +7,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 
-export function PremiumModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+export function PremiumModal({ open, onOpenChange, onUnderstand }: { open: boolean; onOpenChange: (v: boolean) => void; onUnderstand?: () => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="premium-modal-content">
@@ -63,7 +63,10 @@ export function PremiumModal({ open, onOpenChange }: { open: boolean; onOpenChan
           <button
             type="button"
             className="premium-modal-btn"
-            onClick={() => onOpenChange(false)}
+            onClick={() => {
+              onOpenChange(false);
+              onUnderstand?.();
+            }}
           >
             Saya Mengerti
           </button>

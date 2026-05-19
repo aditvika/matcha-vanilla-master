@@ -38,6 +38,7 @@ import {
   completeEmailLinkSignInIfPresent,
 } from "@/lib/firebase";
 import { PremiumModal } from "@/components/premium-modal";
+import { SubscriptionModal } from "@/components/subscription-modal";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -67,6 +68,7 @@ const LANGUAGES = [
 function SettingsPage() {
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
+  const [subOpen, setSubOpen] = useState(false);
   const [name, setName] = useState<string>(() => {
     if (typeof window === "undefined") return "Matcha User";
     return localStorage.getItem("mv:profile:name") || "Matcha User";
@@ -400,7 +402,14 @@ function SettingsPage() {
       </Drawer>
 
       {/* Premium Notification Modal */}
-      <PremiumModal open={premiumOpen} onOpenChange={setPremiumOpen} />
+      <PremiumModal
+        open={premiumOpen}
+        onOpenChange={setPremiumOpen}
+        onUnderstand={() => setTimeout(() => setSubOpen(true), 250)}
+      />
+
+      {/* Subscription plans modal */}
+      <SubscriptionModal open={subOpen} onOpenChange={setSubOpen} />
 
       {/* Language Sheet */}
       <Drawer open={openSheet === "language"} onOpenChange={(o) => !o && setOpenSheet(null)}>
