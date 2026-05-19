@@ -63,7 +63,10 @@ export function PremiumModal({ open, onOpenChange, onUnderstand }: { open: boole
           <button
             type="button"
             className="premium-modal-btn"
-            onClick={() => onOpenChange(false)}
+            onClick={() => {
+              onOpenChange(false);
+              onUnderstand?.();
+            }}
           >
             Saya Mengerti
           </button>
