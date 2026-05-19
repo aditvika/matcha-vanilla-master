@@ -68,6 +68,7 @@ const LANGUAGES = [
 function SettingsPage() {
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
+  const [subOpen, setSubOpen] = useState(false);
   const [name, setName] = useState<string>(() => {
     if (typeof window === "undefined") return "Matcha User";
     return localStorage.getItem("mv:profile:name") || "Matcha User";
@@ -401,7 +402,14 @@ function SettingsPage() {
       </Drawer>
 
       {/* Premium Notification Modal */}
-      <PremiumModal open={premiumOpen} onOpenChange={setPremiumOpen} />
+      <PremiumModal
+        open={premiumOpen}
+        onOpenChange={setPremiumOpen}
+        onUnderstand={() => setSubOpen(true)}
+      />
+
+      {/* Subscription plans modal */}
+      <SubscriptionModal open={subOpen} onOpenChange={setSubOpen} />
 
       {/* Language Sheet */}
       <Drawer open={openSheet === "language"} onOpenChange={(o) => !o && setOpenSheet(null)}>
