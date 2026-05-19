@@ -251,7 +251,7 @@ function HomePage() {
       <PremiumModal
         open={premiumOpen}
         onOpenChange={setPremiumOpen}
-        onUnderstand={() => setSubOpen(true)}
+        onUnderstand={() => setTimeout(() => setSubOpen(true), 250)}
       />
 
       {/* Subscription plans modal */}
