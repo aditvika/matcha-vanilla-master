@@ -31,6 +31,7 @@ import {
   DrawerDescription,
 } from "@/components/ui/drawer";
 import { PremiumModal } from "@/components/premium-modal";
+import { SubscriptionModal } from "@/components/subscription-modal";
 
 export const Route = createFileRoute("/home")({
   head: () => ({

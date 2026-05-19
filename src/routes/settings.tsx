@@ -38,6 +38,7 @@ import {
   completeEmailLinkSignInIfPresent,
 } from "@/lib/firebase";
 import { PremiumModal } from "@/components/premium-modal";
+import { SubscriptionModal } from "@/components/subscription-modal";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
