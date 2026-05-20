@@ -14,7 +14,6 @@ import {
   CheckCircle2,
   Crown,
   Gift,
-  Crown as CrownIcon,
   Medal,
   Award,
 } from "lucide-react";
