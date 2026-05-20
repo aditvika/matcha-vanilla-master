@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   Crown,
   Gift,
+  Medal,
+  Award,
 } from "lucide-react";
 import {
   Dialog,
@@ -94,12 +96,38 @@ const notifications: Notification[] = [
   },
 ];
 
+type LeaderTab = "Bulanan" | "Tahunan" | "Mix";
+type LeaderEntry = { name: string; tier: LeaderTab; mvp: number };
+const leaderboard: Record<LeaderTab, LeaderEntry[]> = {
+  Bulanan: [
+    { name: "Ahmad_Zain", tier: "Bulanan", mvp: 12 },
+    { name: "Siti_Rahma", tier: "Bulanan", mvp: 9 },
+    { name: "Rizky_Alif", tier: "Bulanan", mvp: 6 },
+  ],
+  Tahunan: [
+    { name: "Adityo Saputra", tier: "Tahunan", mvp: 7 },
+    { name: "Vika Adellya", tier: "Tahunan", mvp: 5 },
+    { name: "Hayabusa", tier: "Tahunan", mvp: 2 },
+  ],
+  Mix: [
+    { name: "Kevin_San", tier: "Mix", mvp: 15 },
+    { name: "Putri_Utami", tier: "Mix", mvp: 11 },
+    { name: "Budi_Gaming", tier: "Mix", mvp: 8 },
+  ],
+};
+const rankMeta = [
+  { Icon: Crown, cls: "lb-rank-gold" },
+  { Icon: Medal, cls: "lb-rank-silver" },
+  { Icon: Award, cls: "lb-rank-bronze" },
+];
+
 function HomePage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
   const [faceSwapOpen, setFaceSwapOpen] = useState(false);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
+  const [leaderTab, setLeaderTab] = useState<LeaderTab>("Bulanan");
 
   const openNotifications = () => {
     setNotifOpen(true);
@@ -173,6 +201,56 @@ function HomePage() {
               </button>
             ))}
           </div>
+        </section>
+
+        {/* Premium Leaderboard */}
+        <section className="home-section" aria-label="Premium Leaderboard">
+          <div className="home-section-head">
+            <h3 className="home-section-title">Premium Leaderboard</h3>
+            <span className="home-section-link">See all</span>
+          </div>
+
+          <div className="lb-tabs" role="tablist">
+            {(["Bulanan", "Tahunan", "Mix"] as LeaderTab[]).map((t) => (
+              <button
+                key={t}
+                type="button"
+                role="tab"
+                aria-selected={leaderTab === t}
+                className={`lb-tab ${leaderTab === t ? "lb-tab-active" : ""}`}
+                onClick={() => setLeaderTab(t)}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <ul className="lb-list">
+            {leaderboard[leaderTab].map((entry, i) => {
+              const { Icon, cls } = rankMeta[i];
+              const initials = entry.name
+                .replace(/[_\s]+/g, " ")
+                .split(" ")
+                .map((s) => s[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase();
+              return (
+                <li key={entry.name} className="lb-row">
+                  <div className={`lb-rank ${cls}`}>
+                    <Icon size={18} />
+                    <span className="lb-rank-num">{i + 1}</span>
+                  </div>
+                  <div className="lb-avatar" aria-hidden>{initials}</div>
+                  <div className="lb-user">
+                    <p className="lb-name">{entry.name}</p>
+                    <span className="lb-tier">{entry.tier}</span>
+                  </div>
+                  <span className="lb-score">{entry.mvp} MVP</span>
+                </li>
+              );
+            })}
+          </ul>
         </section>
       </div>
 
