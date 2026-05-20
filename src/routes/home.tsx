@@ -96,6 +96,31 @@ const notifications: Notification[] = [
   },
 ];
 
+type LeaderTab = "Bulanan" | "Tahunan" | "Mix";
+type LeaderEntry = { name: string; tier: LeaderTab; mvp: number };
+const leaderboard: Record<LeaderTab, LeaderEntry[]> = {
+  Bulanan: [
+    { name: "Ahmad_Zain", tier: "Bulanan", mvp: 12 },
+    { name: "Siti_Rahma", tier: "Bulanan", mvp: 9 },
+    { name: "Rizky_Alif", tier: "Bulanan", mvp: 6 },
+  ],
+  Tahunan: [
+    { name: "Adityo Saputra", tier: "Tahunan", mvp: 7 },
+    { name: "Vika Adellya", tier: "Tahunan", mvp: 5 },
+    { name: "Hayabusa", tier: "Tahunan", mvp: 2 },
+  ],
+  Mix: [
+    { name: "Kevin_San", tier: "Mix", mvp: 15 },
+    { name: "Putri_Utami", tier: "Mix", mvp: 11 },
+    { name: "Budi_Gaming", tier: "Mix", mvp: 8 },
+  ],
+};
+const rankMeta = [
+  { Icon: Crown, cls: "lb-rank-gold" },
+  { Icon: Medal, cls: "lb-rank-silver" },
+  { Icon: Award, cls: "lb-rank-bronze" },
+];
+
 function HomePage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
