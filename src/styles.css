@@ -1389,3 +1389,28 @@
   text-shadow: 0 0 12px oklch(0.75 0.16 145 / 0.4);
   flex-shrink: 0;
 }
+
+/* Leaderboard page */
+.lb-page-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.lb-back {
+  width: 42px; height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: oklch(1 0 0 / 0.06);
+  border: 1px solid oklch(1 0 0 / 0.08);
+  color: oklch(0.96 0.005 90);
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.lb-back:hover { background: oklch(1 0 0 / 0.1); }
+.lb-rank-other {
+  background: oklch(1 0 0 / 0.05);
+  color: oklch(0.96 0.005 90 / 0.7);
+  border: 1px solid oklch(1 0 0 / 0.08);
+}
