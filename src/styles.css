@@ -303,7 +303,7 @@
   background-color: oklch(0.22 0.025 240);
   color: oklch(0.96 0.005 90);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  padding-bottom: 6.5rem;
+  padding-bottom: 7.5rem;
 }
 .home-glow {
   position: absolute;
