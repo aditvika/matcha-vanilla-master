@@ -210,15 +210,9 @@ function HomePage() {
           </div>
 
           <ul className="lb-list">
-            {leaderboard[leaderTab].map((entry, i) => {
+            {leaderboardFull[leaderTab].slice(0, 5).map((entry, i) => {
               const { Icon, cls } = rankMeta[i];
-              const initials = entry.name
-                .replace(/[_\s]+/g, " ")
-                .split(" ")
-                .map((s) => s[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase();
+              const initials = getInitials(entry.name);
               return (
                 <li key={entry.name} className="lb-row">
                   <div className={`lb-rank ${cls}`}>
