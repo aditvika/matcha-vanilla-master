@@ -127,6 +127,7 @@ function HomePage() {
   const [faceSwapOpen, setFaceSwapOpen] = useState(false);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
+  const [leaderTab, setLeaderTab] = useState<LeaderTab>("Bulanan");
 
   const openNotifications = () => {
     setNotifOpen(true);
