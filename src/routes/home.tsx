@@ -96,29 +96,13 @@ const notifications: Notification[] = [
   },
 ];
 
-type LeaderTab = "Bulanan" | "Tahunan" | "Mix";
-type LeaderEntry = { name: string; tier: LeaderTab; mvp: number };
-const leaderboard: Record<LeaderTab, LeaderEntry[]> = {
-  Bulanan: [
-    { name: "Ahmad_Zain", tier: "Bulanan", mvp: 12 },
-    { name: "Siti_Rahma", tier: "Bulanan", mvp: 9 },
-    { name: "Rizky_Alif", tier: "Bulanan", mvp: 6 },
-  ],
-  Tahunan: [
-    { name: "Adityo Saputra", tier: "Tahunan", mvp: 7 },
-    { name: "Vika Adellya", tier: "Tahunan", mvp: 5 },
-    { name: "Hayabusa", tier: "Tahunan", mvp: 2 },
-  ],
-  Mix: [
-    { name: "Kevin_San", tier: "Mix", mvp: 15 },
-    { name: "Putri_Utami", tier: "Mix", mvp: 11 },
-    { name: "Budi_Gaming", tier: "Mix", mvp: 8 },
-  ],
-};
+import { leaderboardFull, getInitials, type LeaderTab } from "@/lib/leaderboard-data";
 const rankMeta = [
   { Icon: Crown, cls: "lb-rank-gold" },
   { Icon: Medal, cls: "lb-rank-silver" },
   { Icon: Award, cls: "lb-rank-bronze" },
+  { Icon: Award, cls: "lb-rank-other" },
+  { Icon: Award, cls: "lb-rank-other" },
 ];
 
 function HomePage() {
@@ -207,7 +191,7 @@ function HomePage() {
         <section className="home-section" aria-label="Premium Leaderboard">
           <div className="home-section-head">
             <h3 className="home-section-title">Premium Leaderboard</h3>
-            <span className="home-section-link">See all</span>
+            <Link to="/leaderboard" search={{ tab: leaderTab }} className="home-section-link">See all</Link>
           </div>
 
           <div className="lb-tabs" role="tablist">
@@ -226,15 +210,9 @@ function HomePage() {
           </div>
 
           <ul className="lb-list">
-            {leaderboard[leaderTab].map((entry, i) => {
+            {leaderboardFull[leaderTab].slice(0, 5).map((entry, i) => {
               const { Icon, cls } = rankMeta[i];
-              const initials = entry.name
-                .replace(/[_\s]+/g, " ")
-                .split(" ")
-                .map((s) => s[0])
-                .slice(0, 2)
-                .join("")
-                .toUpperCase();
+              const initials = getInitials(entry.name);
               return (
                 <li key={entry.name} className="lb-row">
                   <div className={`lb-rank ${cls}`}>
