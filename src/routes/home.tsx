@@ -191,7 +191,7 @@ function HomePage() {
         <section className="home-section" aria-label="Premium Leaderboard">
           <div className="home-section-head">
             <h3 className="home-section-title">Premium Leaderboard</h3>
-            <span className="home-section-link">See all</span>
+            <Link to="/leaderboard" search={{ tab: leaderTab }} className="home-section-link">See all</Link>
           </div>
 
           <div className="lb-tabs" role="tablist">
