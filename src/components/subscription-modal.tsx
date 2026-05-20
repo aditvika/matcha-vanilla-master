@@ -11,13 +11,13 @@ const plans = [
   {
     title: "Paket Bulanan",
     price: "Rp 30.000",
-    desc: "Sistem kuota berkala (FUP) maks. 50 foto & 15 video per minggu.",
+    desc: "Sistem kuota berkala (FUP) maks. 50 foto & 15 video per minggu.\nKuota reset setiap minggu.",
     highlighted: false,
   },
   {
     title: "Paket Tahunan",
     price: "Rp 120.000",
-    desc: "Sistem kuota berkala (FUP) maks. 150 foto & 30 video per bulan.",
+    desc: "Sistem kuota berkala (FUP) maks. 150 foto & 30 video per bulan.\nKuota reset setiap bulan.",
     highlighted: true,
     badge: "Lebih Hemat!",
   },
