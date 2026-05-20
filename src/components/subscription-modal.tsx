@@ -59,7 +59,7 @@ export function SubscriptionModal({
               {plan.badge && <span className="sub-plan-badge">{plan.badge}</span>}
               <h3 className="sub-plan-title">{plan.title}</h3>
               <p className="sub-plan-price">{plan.price}</p>
-              <p className="sub-plan-desc">{plan.desc}</p>
+              <p className="sub-plan-desc" style={{ whiteSpace: "pre-line" }}>{plan.desc}</p>
             </button>
           ))}
         </div>
