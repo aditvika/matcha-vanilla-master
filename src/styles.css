@@ -388,23 +388,15 @@
   position: relative;
   border-radius: 20px;
   padding: 1.1rem 1.1rem;
-  background: linear-gradient(135deg,
-    oklch(0.7 0.13 150 / 0.18),
-    oklch(1 0 0 / 0.04));
-  border: 1px solid oklch(1 0 0 / 0.1);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background:
+    linear-gradient(135deg, oklch(0.28 0.07 155) 0%, oklch(0.18 0.04 160) 60%, oklch(0.16 0.03 165) 100%);
+  border: 1px solid oklch(0.75 0.16 145 / 0.22);
+  box-shadow: 0 10px 30px oklch(0 0 0 / 0.35), inset 0 1px 0 oklch(1 0 0 / 0.05);
   overflow: hidden;
+  isolation: isolate;
 }
 .home-featured-glow {
-  position: absolute;
-  top: -40%; right: -20%;
-  width: 200px; height: 200px;
-  border-radius: 9999px;
-  background: radial-gradient(circle, oklch(0.75 0.16 145) 0%, transparent 70%);
-  opacity: 0.45;
-  filter: blur(30px);
-  pointer-events: none;
+  display: none;
 }
 .home-featured-row {
   position: relative;
@@ -418,10 +410,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: linear-gradient(135deg, oklch(0.75 0.16 145), oklch(0.6 0.14 160));
-  color: oklch(0.18 0.02 240);
+  background: linear-gradient(135deg, oklch(0.78 0.17 145), oklch(0.62 0.15 158));
+  color: oklch(0.16 0.02 240);
   flex-shrink: 0;
-  box-shadow: 0 6px 20px oklch(0.65 0.15 145 / 0.4);
+  box-shadow: 0 4px 14px oklch(0.7 0.16 145 / 0.35);
 }
 .home-featured-text { flex: 1; min-width: 0; }
 .home-featured-tag {
