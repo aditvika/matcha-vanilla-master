@@ -5,7 +5,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Check, Zap, Award } from "lucide-react";
+import { Check, Zap, Award, Ticket, LogIn } from "lucide-react";
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useSupabaseSession } from "@/hooks/use-supabase-session";
 
 const plans = [
   {
@@ -36,6 +41,47 @@ export function SubscriptionModal({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
+  const { user } = useSupabaseSession();
+  const [code, setCode] = useState("");
+  const [claiming, setClaiming] = useState(false);
+
+  const handleClaim = async () => {
+    const trimmed = code.trim().toUpperCase();
+    if (!trimmed) {
+      toast.error("Masukkan kode voucher terlebih dahulu");
+      return;
+    }
+    if (!user) {
+      toast.error("Silakan masuk terlebih dahulu untuk klaim voucher");
+      return;
+    }
+    setClaiming(true);
+    try {
+      const { data, error } = await supabase.rpc("claim_voucher", {
+        p_code: trimmed,
+      });
+      if (error) {
+        if (error.message.includes("INVALID_OR_USED")) {
+          toast.error("Kode tidak valid atau sudah digunakan");
+        } else if (error.message.includes("NOT_AUTHENTICATED")) {
+          toast.error("Silakan masuk terlebih dahulu");
+        } else {
+          toast.error("Gagal klaim voucher. Coba lagi.");
+        }
+        return;
+      }
+      const payload = data as { package_type?: string; premium_until?: string } | null;
+      const pkg = payload?.package_type === "yearly" ? "Tahunan" : "Bulanan";
+      toast.success(`Selamat! Paket ${pkg} berhasil diaktifkan 🎉`);
+      setCode("");
+      onOpenChange(false);
+    } catch {
+      toast.error("Kode tidak valid atau sudah digunakan");
+    } finally {
+      setClaiming(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="subscription-modal-content">
@@ -50,17 +96,17 @@ export function SubscriptionModal({
 
         <div className="sub-plans-grid">
           {plans.map((plan) => (
-            <button
+            <div
               key={plan.title}
-              type="button"
               className={`sub-plan-card${plan.highlighted ? " sub-plan-card-highlighted" : ""}`}
-              onClick={() => onOpenChange(false)}
             >
               {plan.badge && <span className="sub-plan-badge">{plan.badge}</span>}
               <h3 className="sub-plan-title">{plan.title}</h3>
               <p className="sub-plan-price">{plan.price}</p>
-              <p className="sub-plan-desc" style={{ whiteSpace: "pre-line" }}>{plan.desc}</p>
-            </button>
+              <p className="sub-plan-desc" style={{ whiteSpace: "pre-line" }}>
+                {plan.desc}
+              </p>
+            </div>
           ))}
         </div>
 
@@ -74,6 +120,42 @@ export function SubscriptionModal({
               </li>
             ))}
           </ul>
+        </div>
+
+        <div className="voucher-section">
+          <h4 className="voucher-title">
+            <Ticket size={16} /> Punya Kode Voucher?
+          </h4>
+          {user ? (
+            <div className="voucher-row">
+              <input
+                type="text"
+                className="voucher-input"
+                placeholder="Masukkan Kode Voucher"
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                disabled={claiming}
+                autoCapitalize="characters"
+              />
+              <button
+                type="button"
+                className="voucher-btn"
+                onClick={handleClaim}
+                disabled={claiming}
+              >
+                {claiming ? "Memproses…" : "Klaim Premium"}
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/auth"
+              className="voucher-signin"
+              onClick={() => onOpenChange(false)}
+            >
+              <LogIn size={16} />
+              <span>Masuk untuk klaim voucher</span>
+            </Link>
+          )}
         </div>
 
         <p className="sub-footer-note">
