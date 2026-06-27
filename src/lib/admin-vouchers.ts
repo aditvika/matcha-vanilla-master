@@ -20,7 +20,6 @@ function assertAdmin(claims: { email?: string } | Record<string, unknown>) {
 }
 
 export const generateVouchersFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .validator(
     (input: { quantity: number; packageType: "monthly" | "yearly" }) => {
       const quantity = Math.max(1, Math.min(100, Math.floor(input.quantity)));
@@ -29,6 +28,7 @@ export const generateVouchersFn = createServerFn({ method: "POST" })
       return { quantity, packageType };
     },
   )
+  .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }) => {
     assertAdmin(context.claims as { email?: string });
     const { supabaseAdmin } = await import(
