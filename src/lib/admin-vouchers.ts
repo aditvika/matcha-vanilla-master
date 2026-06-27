@@ -20,7 +20,7 @@ function assertAdmin(claims: { email?: string } | Record<string, unknown>) {
 }
 
 export const generateVouchersFn = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     (input: { quantity: number; packageType: "monthly" | "yearly" }) => {
       const quantity = Math.max(1, Math.min(100, Math.floor(input.quantity)));
       const packageType =
