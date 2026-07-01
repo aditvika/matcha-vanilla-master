@@ -182,7 +182,7 @@ function SettingsPage() {
     isExternal?: boolean;
     isAdmin?: boolean;
   }> = [
-    ...(supaUser?.email?.toLowerCase() === ADMIN_EMAIL
+    ...(userEmail.toLowerCase() === ADMIN_EMAIL
       ? [
           {
             label: "Admin Dashboard",
