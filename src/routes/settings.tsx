@@ -177,7 +177,19 @@ function SettingsPage() {
     Icon: typeof UserCircle2;
     onClick: () => void;
     isExternal?: boolean;
+    isAdmin?: boolean;
   }> = [
+    ...(supaUser?.email?.toLowerCase() === ADMIN_EMAIL
+      ? [
+          {
+            label: "Admin Dashboard",
+            desc: "Manage vouchers & subscribers",
+            Icon: Shield,
+            onClick: () => navigate({ to: "/admin" }),
+            isAdmin: true,
+          },
+        ]
+      : []),
     {
       label: "Account Profile",
       desc: "Name, email and avatar",
