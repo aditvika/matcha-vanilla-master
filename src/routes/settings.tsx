@@ -39,6 +39,11 @@ import {
 } from "@/lib/firebase";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
+import { useSupabaseSession } from "@/hooks/use-supabase-session";
+import { useNavigate } from "@tanstack/react-router";
+import { Shield } from "lucide-react";
+
+const ADMIN_EMAIL = "tyozxtar@gmail.com";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -66,6 +71,8 @@ const LANGUAGES = [
 ];
 
 function SettingsPage() {
+  const navigate = useNavigate();
+  const { user: supaUser } = useSupabaseSession();
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
@@ -172,7 +179,19 @@ function SettingsPage() {
     Icon: typeof UserCircle2;
     onClick: () => void;
     isExternal?: boolean;
+    isAdmin?: boolean;
   }> = [
+    ...(supaUser?.email?.toLowerCase() === ADMIN_EMAIL
+      ? [
+          {
+            label: "Admin Dashboard",
+            desc: "Manage vouchers & subscribers",
+            Icon: Shield,
+            onClick: () => navigate({ to: "/admin" }),
+            isAdmin: true,
+          },
+        ]
+      : []),
     {
       label: "Account Profile",
       desc: "Name, email and avatar",
@@ -217,9 +236,13 @@ function SettingsPage() {
 
         <section className="home-section" aria-label="Account settings">
           <ul className="settings-list">
-            {items.map(({ label, desc, Icon, onClick, isExternal }) => (
+            {items.map(({ label, desc, Icon, onClick, isExternal, isAdmin }) => (
               <li key={label}>
-                <button type="button" className="settings-item" onClick={onClick}>
+                <button
+                  type="button"
+                  className={`settings-item${isAdmin ? " settings-item-admin" : ""}`}
+                  onClick={onClick}
+                >
                   <div className="settings-item-icon">
                     <Icon size={20} />
                   </div>
