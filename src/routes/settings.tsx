@@ -73,6 +73,7 @@ const LANGUAGES = [
 function SettingsPage() {
   const navigate = useNavigate();
   const { user: supaUser } = useSupabaseSession();
+  void supaUser;
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
@@ -181,7 +182,7 @@ function SettingsPage() {
     isExternal?: boolean;
     isAdmin?: boolean;
   }> = [
-    ...(supaUser?.email?.toLowerCase() === ADMIN_EMAIL
+    ...(userEmail.toLowerCase() === ADMIN_EMAIL
       ? [
           {
             label: "Admin Dashboard",
