@@ -73,6 +73,7 @@ const LANGUAGES = [
 function SettingsPage() {
   const navigate = useNavigate();
   const { user: supaUser } = useSupabaseSession();
+  void supaUser;
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
