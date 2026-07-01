@@ -39,6 +39,11 @@ import {
 } from "@/lib/firebase";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
+import { useSupabaseSession } from "@/hooks/use-supabase-session";
+import { useNavigate } from "@tanstack/react-router";
+import { Shield } from "lucide-react";
+
+const ADMIN_EMAIL = "tyozxtar@gmail.com";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
