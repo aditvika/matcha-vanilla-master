@@ -236,9 +236,13 @@ function SettingsPage() {
 
         <section className="home-section" aria-label="Account settings">
           <ul className="settings-list">
-            {items.map(({ label, desc, Icon, onClick, isExternal }) => (
+            {items.map(({ label, desc, Icon, onClick, isExternal, isAdmin }) => (
               <li key={label}>
-                <button type="button" className="settings-item" onClick={onClick}>
+                <button
+                  type="button"
+                  className={`settings-item${isAdmin ? " settings-item-admin" : ""}`}
+                  onClick={onClick}
+                >
                   <div className="settings-item-icon">
                     <Icon size={20} />
                   </div>
