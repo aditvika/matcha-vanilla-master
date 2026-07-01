@@ -1529,3 +1529,23 @@
 .admin-copy-btn:hover { background: oklch(0.78 0.18 155 / 0.2); }
 .admin-muted { color: oklch(0.96 0.005 90 / 0.5); font-size: 0.8rem; }
 .admin-empty { text-align: center; padding: 2rem; color: oklch(0.96 0.005 90 / 0.5); }
+
+/* Admin extras */
+.settings-item-admin { background: linear-gradient(135deg, oklch(0.32 0.09 155 / 0.35), oklch(0.24 0.04 240 / 0.6)); border: 1px solid oklch(0.6 0.15 155 / 0.35); }
+.settings-item-admin .settings-item-icon { color: oklch(0.85 0.15 155); }
+
+.admin-pkg-select { display: flex; gap: 8px; margin-bottom: 12px; }
+.admin-pkg-opt { flex: 1; padding: 10px 14px; border-radius: 10px; background: oklch(0.22 0.02 240); color: oklch(0.85 0.02 240); border: 1px solid oklch(1 0 0 / 0.08); font-weight: 600; cursor: pointer; transition: all .2s; }
+.admin-pkg-opt-active { background: oklch(0.32 0.09 155); color: white; border-color: oklch(0.6 0.15 155 / 0.5); }
+
+.admin-last-code { margin-top: 14px; padding: 14px; border-radius: 12px; background: oklch(0.18 0.02 240); border: 1px dashed oklch(0.6 0.15 155 / 0.5); }
+.admin-last-code-label { font-size: 12px; color: oklch(0.7 0.02 240); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.admin-last-code-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.admin-last-code-value { font-family: ui-monospace, monospace; font-size: 18px; font-weight: 700; color: oklch(0.9 0.15 155); letter-spacing: 0.06em; }
+.admin-last-code-copy { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 8px; background: oklch(0.32 0.09 155); color: white; border: none; cursor: pointer; font-weight: 600; font-size: 13px; }
+
+.admin-subs-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.admin-user-cell { display: flex; flex-direction: column; }
+.admin-user-name { color: white; font-weight: 600; }
+.admin-user-email { color: oklch(0.65 0.02 240); font-size: 12px; }
+.admin-countdown { color: oklch(0.85 0.12 155); font-weight: 600; font-size: 13px; }
