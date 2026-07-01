@@ -71,3 +71,46 @@ export const checkIsAdminFn = createServerFn({ method: "GET" })
     const email = (context.claims as { email?: string }).email?.toLowerCase();
     return { isAdmin: email === ADMIN_EMAIL, email: email ?? null };
   });
+
+export const listSubscribersFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    assertAdmin(context.claims as { email?: string });
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+
+    // Get active premium profiles
+    const { data: profiles, error: pErr } = await supabaseAdmin
+      .from("profiles")
+      .select("id, email, display_name, is_premium, premium_until")
+      .eq("is_premium", true)
+      .gt("premium_until", new Date().toISOString())
+      .order("premium_until", { ascending: true });
+    if (pErr) throw new Error(pErr.message);
+
+    // Determine package via most recent used voucher per user
+    const ids = (profiles ?? []).map((p) => p.id);
+    let pkgMap = new Map<string, "monthly" | "yearly">();
+    if (ids.length) {
+      const { data: vs, error: vErr } = await supabaseAdmin
+        .from("vouchers")
+        .select("used_by, package_type, used_at")
+        .in("used_by", ids)
+        .order("used_at", { ascending: false });
+      if (vErr) throw new Error(vErr.message);
+      for (const v of vs ?? []) {
+        if (v.used_by && !pkgMap.has(v.used_by)) {
+          pkgMap.set(v.used_by, v.package_type as "monthly" | "yearly");
+        }
+      }
+    }
+
+    return (profiles ?? []).map((p) => ({
+      id: p.id,
+      email: p.email,
+      display_name: p.display_name,
+      premium_until: p.premium_until,
+      package_type: pkgMap.get(p.id) ?? "monthly",
+    }));
+  });
