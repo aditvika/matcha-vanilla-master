@@ -3,6 +3,18 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const ADMIN_EMAIL = "tyozxtar@gmail.com";
 
+type AuthenticatedContext = {
+  claims: unknown;
+  supabase: {
+    auth: {
+      getUser: () => Promise<{
+        data: { user: { email?: string | null } | null };
+        error: unknown;
+      }>;
+    };
+  };
+};
+
 function randomCode() {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const block = () =>
@@ -12,11 +24,27 @@ function randomCode() {
   return `MV-${block()}-${block()}`;
 }
 
-function assertAdmin(claims: { email?: string } | Record<string, unknown>) {
-  const email = (claims as { email?: string }).email?.toLowerCase();
+function getClaimEmail(claims: unknown) {
+  if (!claims || typeof claims !== "object") return "";
+  const email = (claims as { email?: unknown }).email;
+  return typeof email === "string" ? email.toLowerCase() : "";
+}
+
+async function getAuthenticatedEmail(context: AuthenticatedContext) {
+  const claimEmail = getClaimEmail(context.claims);
+  if (claimEmail) return claimEmail;
+
+  const { data, error } = await context.supabase.auth.getUser();
+  if (error) throw new Error("Unauthorized: Invalid user session");
+  return data.user?.email?.toLowerCase() ?? "";
+}
+
+async function assertAdmin(context: AuthenticatedContext) {
+  const email = await getAuthenticatedEmail(context);
   if (email !== ADMIN_EMAIL) {
     throw new Error("FORBIDDEN");
   }
+  return email;
 }
 
 export const generateVouchersFn = createServerFn({ method: "POST" })
@@ -30,7 +58,7 @@ export const generateVouchersFn = createServerFn({ method: "POST" })
   )
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }) => {
-    assertAdmin(context.claims as { email?: string });
+    await assertAdmin(context as AuthenticatedContext);
     const { supabaseAdmin } = await import(
       "@/integrations/supabase/client.server"
     );
@@ -52,7 +80,7 @@ export const generateVouchersFn = createServerFn({ method: "POST" })
 export const listVouchersFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    assertAdmin(context.claims as { email?: string });
+    await assertAdmin(context as AuthenticatedContext);
     const { supabaseAdmin } = await import(
       "@/integrations/supabase/client.server"
     );
@@ -68,14 +96,14 @@ export const listVouchersFn = createServerFn({ method: "GET" })
 export const checkIsAdminFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const email = (context.claims as { email?: string }).email?.toLowerCase();
+    const email = await getAuthenticatedEmail(context as AuthenticatedContext);
     return { isAdmin: email === ADMIN_EMAIL, email: email ?? null };
   });
 
 export const listSubscribersFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    assertAdmin(context.claims as { email?: string });
+    await assertAdmin(context as AuthenticatedContext);
     const { supabaseAdmin } = await import(
       "@/integrations/supabase/client.server"
     );

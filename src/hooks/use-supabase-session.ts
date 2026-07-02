@@ -1,4 +1,5 @@
 import { createContext, createElement, useContext, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,7 +16,7 @@ export function SupabaseSessionProvider({
   children,
   onAuthChange,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   onAuthChange?: (event: string, session: Session | null) => void;
 }) {
   const [session, setSession] = useState<Session | null>(null);
