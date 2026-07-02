@@ -67,8 +67,7 @@ const LANGUAGES = [
 
 function SettingsPage() {
   const navigate = useNavigate();
-  const { user: supaUser } = useSupabaseSession();
-  void supaUser;
+  const { user: supaUser, loading: authLoading } = useSupabaseSession();
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
@@ -80,14 +79,15 @@ function SettingsPage() {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("mv:profile:avatar");
   });
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [userEmail, setUserEmail] = useState<string>("");
   const [emailInput, setEmailInput] = useState<string>("");
   const [sendingLink, setSendingLink] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [language, setLanguage] = useState("en-US");
   const isPremium = false;
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isLoggedIn = !!supaUser;
+  const userEmail = supaUser?.email ?? "";
 
   useEffect(() => {
     localStorage.setItem("mv:profile:name", name);
@@ -96,23 +96,6 @@ function SettingsPage() {
     if (avatar) localStorage.setItem("mv:profile:avatar", avatar);
     else localStorage.removeItem("mv:profile:avatar");
   }, [avatar]);
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setIsLoggedIn(true);
-        setUserEmail(user.email ?? "");
-      } else {
-        setIsLoggedIn(false);
-        setUserEmail("");
-      }
-    });
-    completeEmailLinkSignInIfPresent().catch((err) => {
-      console.error(err);
-      toast.error("Could not complete email sign-in");
-    });
-    return () => unsub();
-  }, []);
 
   const handleAvatarPick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -124,7 +107,7 @@ function SettingsPage() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await supabase.auth.signOut();
       toast.success("Signed out");
     } catch (err) {
       console.error(err);
@@ -141,7 +124,11 @@ function SettingsPage() {
     }
     setSendingLink(true);
     try {
-      await sendMagicLink(email);
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/settings` },
+      });
+      if (error) throw error;
       toast.success("Magic link sent! Check your inbox.");
       setEmailInput("");
     } catch (err: unknown) {
@@ -156,8 +143,11 @@ function SettingsPage() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      const user = await signInWithGoogle();
-      toast.success(`Welcome ${user.displayName ?? user.email ?? ""}`);
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (!result.redirected) toast.success("Welcome!");
     } catch (err: unknown) {
       console.error(err);
       const message = err instanceof Error ? err.message : "Google sign-in failed";
@@ -166,6 +156,7 @@ function SettingsPage() {
       setGoogleLoading(false);
     }
   };
+
 
   const currentLangLabel = LANGUAGES.find((l) => l.code === language)?.label ?? "English (US)";
 
