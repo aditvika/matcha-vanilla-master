@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Mail, Lock, ArrowLeft, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { session, loading } = useSupabaseSession();
+  const postLoginRedirectRef = useRef(false);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +48,7 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Welcome back!");
       }
-      navigate({ to: "/settings", replace: true });
+      postLoginRedirectRef.current = true;
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed";
       toast.error(msg);
@@ -63,7 +64,7 @@ function AuthPage() {
         redirect_uri: `${window.location.origin}/auth`,
       });
       if (result.error) throw result.error;
-      if (!result.redirected) navigate({ to: "/settings", replace: true });
+      if (!result.redirected) postLoginRedirectRef.current = true;
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Google sign-in failed";
       toast.error(msg);

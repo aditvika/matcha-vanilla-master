@@ -93,10 +93,11 @@ function SplashScreen() {
 
   useEffect(() => {
     if (loading) return;
-    const t = setTimeout(
-      () => navigate({ to: "/home", replace: true }),
-      session ? 0 : 2600,
-    );
+    if (session) {
+      navigate({ to: "/home", replace: true });
+      return;
+    }
+    const t = setTimeout(() => navigate({ to: "/home", replace: true }), 2600);
     return () => clearTimeout(t);
   }, [loading, navigate, session]);
 
