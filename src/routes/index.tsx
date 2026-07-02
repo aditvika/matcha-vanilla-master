@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { useSupabaseSession } from "@/hooks/use-supabase-session";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -88,10 +89,16 @@ function HeartSpark() {
 
 function SplashScreen() {
   const navigate = useNavigate();
+  const { session, loading } = useSupabaseSession();
+
   useEffect(() => {
-    const t = setTimeout(() => navigate({ to: "/home" }), 2600);
+    if (loading) return;
+    const t = setTimeout(
+      () => navigate({ to: "/home", replace: true }),
+      session ? 0 : 2600,
+    );
     return () => clearTimeout(t);
-  }, [navigate]);
+  }, [loading, navigate, session]);
 
   return (
     <main className="splash-root">
