@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useCallback } from "react";
 import {
   Outlet,
   Link,
@@ -8,6 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { SupabaseSessionProvider } from "@/hooks/use-supabase-session";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -72,11 +74,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "MVMaster — Matcha Vanilla Production" },
+      {
+        name: "description",
+        content: "MVMaster by Matcha Vanilla Production for premium AI creative tools.",
+      },
+      { name: "author", content: "Matcha Vanilla Production" },
+      { property: "og:title", content: "MVMaster — Matcha Vanilla Production" },
+      {
+        property: "og:description",
+        content: "Premium AI creative tools for photo enhancement, video upscale, and more.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -110,10 +118,31 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  const handleAuthChange = useCallback(
+    (event: string, session: unknown) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") {
+        return;
+      }
+
+      router.invalidate();
+      if (event === "SIGNED_OUT") {
+        queryClient.clear();
+        return;
+      }
+      if (session) {
+        queryClient.invalidateQueries();
+      }
+    },
+    [queryClient, router],
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <SupabaseSessionProvider onAuthChange={handleAuthChange}>
+        <Outlet />
+      </SupabaseSessionProvider>
     </QueryClientProvider>
   );
 }

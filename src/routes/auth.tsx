@@ -23,7 +23,7 @@ function AuthPage() {
 
   useEffect(() => {
     if (!loading && session) {
-      navigate({ to: "/settings" });
+      navigate({ to: "/settings", replace: true });
     }
   }, [loading, session, navigate]);
 
@@ -47,7 +47,6 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Welcome back!");
       }
-      navigate({ to: "/settings" });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed";
       toast.error(msg);
@@ -60,10 +59,9 @@ function AuthPage() {
     setBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth`,
       });
       if (result.error) throw result.error;
-      if (!result.redirected) navigate({ to: "/settings" });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Google sign-in failed";
       toast.error(msg);

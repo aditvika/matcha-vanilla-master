@@ -7,9 +7,10 @@ import {
   generateVouchersFn,
   listVouchersFn,
   listSubscribersFn,
-  checkIsAdminFn,
 } from "@/lib/admin-vouchers";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
+
+const ADMIN_EMAIL = "tyozxtar@gmail.com";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -50,19 +51,16 @@ function AdminPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) {
-      navigate({ to: "/auth" });
+      navigate({ to: "/auth", replace: true });
       return;
     }
-    checkIsAdminFn()
-      .then((res) => {
-        if (!res.isAdmin) {
-          toast.error("Access denied");
-          navigate({ to: "/home" });
-        } else {
-          setAuthorized(true);
-        }
-      })
-      .catch(() => navigate({ to: "/home" }));
+    const email = session.user.email?.toLowerCase() ?? "";
+    if (email !== ADMIN_EMAIL) {
+      toast.error("Access denied");
+      navigate({ to: "/home", replace: true });
+      return;
+    }
+    setAuthorized(true);
   }, [loading, session, navigate]);
 
   const vouchersQuery = useQuery({
