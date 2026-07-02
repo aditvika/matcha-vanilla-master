@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, createElement, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -62,11 +62,7 @@ export function SupabaseSessionProvider({
     [loading, session],
   );
 
-  return (
-    <SupabaseSessionContext.Provider value={value}>
-      {children}
-    </SupabaseSessionContext.Provider>
-  );
+  return createElement(SupabaseSessionContext.Provider, { value }, children);
 }
 
 export function useSupabaseSession() {
