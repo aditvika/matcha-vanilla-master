@@ -30,16 +30,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import {
-  auth,
-  sendMagicLink,
-  signInWithGoogle,
-  completeEmailLinkSignInIfPresent,
-} from "@/lib/firebase";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useNavigate } from "@tanstack/react-router";
 import { Shield } from "lucide-react";
 
