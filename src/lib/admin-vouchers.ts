@@ -5,6 +5,7 @@ const ADMIN_EMAIL = "tyozxtar@gmail.com";
 
 type AuthenticatedContext = {
   claims: unknown;
+  userId: string;
   supabase: {
     auth: {
       getUser: () => Promise<{
@@ -34,7 +35,8 @@ async function getAuthenticatedEmail(context: AuthenticatedContext) {
   const claimEmail = getClaimEmail(context.claims);
   if (claimEmail) return claimEmail;
 
-  const { data, error } = await context.supabase.auth.getUser();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin.auth.admin.getUserById(context.userId);
   if (error) throw new Error("Unauthorized: Invalid user session");
   return data.user?.email?.toLowerCase() ?? "";
 }
