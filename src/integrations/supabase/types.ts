@@ -21,6 +21,7 @@ export type Database = {
           email: string | null
           id: string
           is_premium: boolean
+          package_type: string | null
           premium_until: string | null
           updated_at: string
         }
@@ -30,6 +31,7 @@ export type Database = {
           email?: string | null
           id: string
           is_premium?: boolean
+          package_type?: string | null
           premium_until?: string | null
           updated_at?: string
         }
@@ -39,6 +41,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_premium?: boolean
+          package_type?: string | null
           premium_until?: string | null
           updated_at?: string
         }
