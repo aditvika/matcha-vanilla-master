@@ -144,7 +144,7 @@ export function SubscriptionModal({
                 onClick={handleClaim}
                 disabled={claiming}
               >
-                {claiming ? "Memproses…" : "Klaim Premium"}
+                {claiming ? "Memproses…" : "Aktifkan Premium"}
               </button>
             </div>
           ) : (
