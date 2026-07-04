@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/drawer";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
+import { usePremiumStatus } from "@/hooks/use-premium-status";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
