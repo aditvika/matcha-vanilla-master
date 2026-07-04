@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
+import { usePremiumStatus } from "@/hooks/use-premium-status";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useNavigate } from "@tanstack/react-router";
