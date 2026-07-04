@@ -125,7 +125,7 @@ export function SubscriptionModal({
 
         <div className="voucher-section">
           <h4 className="voucher-title">
-            <Ticket size={16} /> Punya Kode Voucher?
+            <Ticket size={16} /> Punya Kode Aktivasi?
           </h4>
           {user ? (
             <div className="voucher-row">
