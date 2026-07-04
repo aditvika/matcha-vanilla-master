@@ -132,7 +132,7 @@ export function SubscriptionModal({
               <input
                 type="text"
                 className="voucher-input"
-                placeholder="Masukkan Kode Voucher"
+                placeholder="Masukkan Kode Aktivasi"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 disabled={claiming}
