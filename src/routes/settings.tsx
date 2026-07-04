@@ -85,7 +85,12 @@ function SettingsPage() {
   const [sendingLink, setSendingLink] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [language, setLanguage] = useState("en-US");
-  const isPremium = false;
+  const { isPremium, packageType } = usePremiumStatus();
+  const premiumLabel = isPremium
+    ? packageType === "yearly"
+      ? "Premium Active - Tahunan"
+      : "Premium Active - Bulanan"
+    : "Free Plan";
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isLoggedIn = !!supaUser;
