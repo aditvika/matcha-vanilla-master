@@ -113,6 +113,7 @@ function HomePage() {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
   const [leaderTab, setLeaderTab] = useState<LeaderTab>("Bulanan");
+  const { isPremium } = usePremiumStatus();
 
   const openNotifications = () => {
     setNotifOpen(true);
