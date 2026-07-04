@@ -43,17 +43,18 @@ export function SubscriptionModal({
   onOpenChange: (v: boolean) => void;
 }) {
   const { user } = useSupabaseSession();
+  const { refresh: refreshPremium } = usePremiumStatus();
   const [code, setCode] = useState("");
   const [claiming, setClaiming] = useState(false);
 
   const handleClaim = async () => {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) {
-      toast.error("Masukkan kode voucher terlebih dahulu");
+      toast.error("Masukkan kode aktivasi terlebih dahulu");
       return;
     }
     if (!user) {
-      toast.error("Silakan masuk terlebih dahulu untuk klaim voucher");
+      toast.error("Silakan masuk terlebih dahulu untuk mengaktifkan premium");
       return;
     }
     setClaiming(true);
@@ -62,22 +63,21 @@ export function SubscriptionModal({
         p_code: trimmed,
       });
       if (error) {
-        if (error.message.includes("INVALID_OR_USED")) {
-          toast.error("Kode tidak valid atau sudah digunakan");
-        } else if (error.message.includes("NOT_AUTHENTICATED")) {
+        if (error.message.includes("NOT_AUTHENTICATED")) {
           toast.error("Silakan masuk terlebih dahulu");
         } else {
-          toast.error("Gagal klaim voucher. Coba lagi.");
+          toast.error("Kode aktivasi salah atau sudah digunakan!");
         }
         return;
       }
       const payload = data as { package_type?: string; premium_until?: string } | null;
       const pkg = payload?.package_type === "yearly" ? "Tahunan" : "Bulanan";
-      toast.success(`Selamat! Paket ${pkg} berhasil diaktifkan 🎉`);
+      toast.success(`Premium ${pkg} berhasil diaktifkan 🎉`);
       setCode("");
+      await refreshPremium();
       onOpenChange(false);
     } catch {
-      toast.error("Kode tidak valid atau sudah digunakan");
+      toast.error("Kode aktivasi salah atau sudah digunakan!");
     } finally {
       setClaiming(false);
     }
