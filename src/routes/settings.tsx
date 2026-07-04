@@ -194,7 +194,7 @@ function SettingsPage() {
     },
     {
       label: "Manage Premium Subscription",
-      desc: isPremium ? "Premium Active" : "Free Plan",
+      desc: premiumLabel,
       Icon: Crown,
       onClick: () => setPremiumOpen(true),
     },
