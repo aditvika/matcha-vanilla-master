@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
+import { usePremiumStatus } from "@/hooks/use-premium-status";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useNavigate } from "@tanstack/react-router";
@@ -84,7 +85,12 @@ function SettingsPage() {
   const [sendingLink, setSendingLink] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [language, setLanguage] = useState("en-US");
-  const isPremium = false;
+  const { isPremium, packageType } = usePremiumStatus();
+  const premiumLabel = isPremium
+    ? packageType === "yearly"
+      ? "Premium Active - Tahunan"
+      : "Premium Active - Bulanan"
+    : "Free Plan";
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isLoggedIn = !!supaUser;
@@ -188,7 +194,7 @@ function SettingsPage() {
     },
     {
       label: "Manage Premium Subscription",
-      desc: isPremium ? "Premium Active" : "Free Plan",
+      desc: premiumLabel,
       Icon: Crown,
       onClick: () => setPremiumOpen(true),
     },

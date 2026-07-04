@@ -11,6 +11,7 @@ import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
+import { usePremiumStatus } from "@/hooks/use-premium-status";
 
 const plans = [
   {
@@ -42,17 +43,18 @@ export function SubscriptionModal({
   onOpenChange: (v: boolean) => void;
 }) {
   const { user } = useSupabaseSession();
+  const { refresh: refreshPremium } = usePremiumStatus();
   const [code, setCode] = useState("");
   const [claiming, setClaiming] = useState(false);
 
   const handleClaim = async () => {
     const trimmed = code.trim().toUpperCase();
     if (!trimmed) {
-      toast.error("Masukkan kode voucher terlebih dahulu");
+      toast.error("Masukkan kode aktivasi terlebih dahulu");
       return;
     }
     if (!user) {
-      toast.error("Silakan masuk terlebih dahulu untuk klaim voucher");
+      toast.error("Silakan masuk terlebih dahulu untuk mengaktifkan premium");
       return;
     }
     setClaiming(true);
@@ -61,22 +63,21 @@ export function SubscriptionModal({
         p_code: trimmed,
       });
       if (error) {
-        if (error.message.includes("INVALID_OR_USED")) {
-          toast.error("Kode tidak valid atau sudah digunakan");
-        } else if (error.message.includes("NOT_AUTHENTICATED")) {
+        if (error.message.includes("NOT_AUTHENTICATED")) {
           toast.error("Silakan masuk terlebih dahulu");
         } else {
-          toast.error("Gagal klaim voucher. Coba lagi.");
+          toast.error("Kode aktivasi salah atau sudah digunakan!");
         }
         return;
       }
       const payload = data as { package_type?: string; premium_until?: string } | null;
       const pkg = payload?.package_type === "yearly" ? "Tahunan" : "Bulanan";
-      toast.success(`Selamat! Paket ${pkg} berhasil diaktifkan 🎉`);
+      toast.success(`Premium ${pkg} berhasil diaktifkan 🎉`);
       setCode("");
+      await refreshPremium();
       onOpenChange(false);
     } catch {
-      toast.error("Kode tidak valid atau sudah digunakan");
+      toast.error("Kode aktivasi salah atau sudah digunakan!");
     } finally {
       setClaiming(false);
     }
@@ -124,14 +125,14 @@ export function SubscriptionModal({
 
         <div className="voucher-section">
           <h4 className="voucher-title">
-            <Ticket size={16} /> Punya Kode Voucher?
+            <Ticket size={16} /> Punya Kode Aktivasi?
           </h4>
           {user ? (
             <div className="voucher-row">
               <input
                 type="text"
                 className="voucher-input"
-                placeholder="Masukkan Kode Voucher"
+                placeholder="Masukkan Kode Aktivasi"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 disabled={claiming}
@@ -143,7 +144,7 @@ export function SubscriptionModal({
                 onClick={handleClaim}
                 disabled={claiming}
               >
-                {claiming ? "Memproses…" : "Klaim Premium"}
+                {claiming ? "Memproses…" : "Aktifkan Premium"}
               </button>
             </div>
           ) : (

@@ -1549,3 +1549,113 @@
 .admin-user-name { color: white; font-weight: 600; }
 .admin-user-email { color: oklch(0.65 0.02 240); font-size: 12px; }
 .admin-countdown { color: oklch(0.85 0.12 155); font-weight: 600; font-size: 13px; }
+
+/* =====================================================================
+   PREMIUM ACTIVATED BANNER (Home)
+   ===================================================================== */
+.home-premium-banner {
+  position: relative;
+  border-radius: 20px;
+  padding: 1.15rem 1.2rem;
+  background:
+    linear-gradient(135deg, oklch(0.32 0.14 300) 0%, oklch(0.22 0.11 295) 55%, oklch(0.16 0.08 290) 100%);
+  border: 1px solid oklch(0.75 0.19 300 / 0.35);
+  box-shadow:
+    0 10px 34px oklch(0.35 0.18 300 / 0.35),
+    inset 0 1px 0 oklch(1 0 0 / 0.06);
+  overflow: hidden;
+  isolation: isolate;
+}
+.home-premium-banner-glow {
+  position: absolute;
+  inset: -40% -20% auto -20%;
+  height: 140%;
+  background: radial-gradient(circle at 30% 20%, oklch(0.75 0.19 300 / 0.35) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+.home-premium-banner-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+}
+.home-premium-banner-icon {
+  width: 46px; height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: linear-gradient(135deg, oklch(0.78 0.19 300), oklch(0.55 0.2 295));
+  color: oklch(0.98 0.005 300);
+  flex-shrink: 0;
+  box-shadow: 0 6px 18px oklch(0.6 0.2 300 / 0.55);
+}
+.home-premium-banner-text { flex: 1; min-width: 0; text-align: center; }
+.home-premium-banner-tag {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(0.88 0.13 300);
+  text-shadow: 0 0 12px oklch(0.75 0.2 300 / 0.55);
+}
+.home-premium-banner-title {
+  margin: 0.25rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: oklch(0.98 0.02 300);
+}
+
+/* =====================================================================
+   PREMIUM THEME OVERRIDES — active when <html> has .mv-premium
+   Switches green accents to deep purple across app surfaces
+   ===================================================================== */
+.mv-premium .home-glow-green {
+  background: radial-gradient(circle, oklch(0.55 0.2 295) 0%, transparent 70%);
+  opacity: 0.4;
+}
+.mv-premium .home-glow-warm {
+  background: radial-gradient(circle, oklch(0.5 0.17 320) 0%, transparent 70%);
+  opacity: 0.22;
+}
+.mv-premium .home-bell-dot {
+  background: oklch(0.75 0.2 300);
+  box-shadow: 0 0 10px oklch(0.75 0.2 300 / 0.75);
+}
+.mv-premium .home-section-link { color: oklch(0.85 0.15 300); }
+
+.mv-premium .home-card:hover { border-color: oklch(0.7 0.17 300 / 0.5); }
+.mv-premium .home-card-icon {
+  background: linear-gradient(135deg, oklch(0.35 0.16 300 / 0.6), oklch(0.22 0.1 295 / 0.6));
+  color: oklch(0.9 0.14 300);
+  border: 1px solid oklch(0.75 0.19 300 / 0.4);
+  box-shadow:
+    0 4px 14px oklch(0.5 0.2 300 / 0.35),
+    inset 0 1px 0 oklch(1 0 0 / 0.06);
+}
+
+.mv-premium .home-nav {
+  border-color: oklch(0.7 0.18 300 / 0.35);
+  box-shadow:
+    0 10px 40px oklch(0 0 0 / 0.45),
+    0 0 26px oklch(0.6 0.2 300 / 0.35);
+}
+.mv-premium .home-nav-active {
+  background: oklch(0.55 0.2 300 / 0.22);
+  color: oklch(0.9 0.15 300);
+}
+.mv-premium .home-nav-create {
+  background: linear-gradient(135deg, oklch(0.7 0.2 300), oklch(0.5 0.2 295));
+  color: oklch(0.98 0.005 300);
+  box-shadow:
+    0 6px 22px oklch(0.55 0.22 300 / 0.65),
+    0 0 20px oklch(0.7 0.2 300 / 0.5);
+}
+.mv-premium .home-nav-create:hover { color: oklch(0.98 0.005 300); }
+
+.mv-premium .settings-item-icon { color: oklch(0.85 0.15 300); }
+

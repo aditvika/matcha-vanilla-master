@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/drawer";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
+import { usePremiumStatus } from "@/hooks/use-premium-status";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -112,6 +113,7 @@ function HomePage() {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
   const [leaderTab, setLeaderTab] = useState<LeaderTab>("Bulanan");
+  const { isPremium } = usePremiumStatus();
 
   const openNotifications = () => {
     setNotifOpen(true);
@@ -141,28 +143,43 @@ function HomePage() {
           </button>
         </header>
 
-        {/* Featured glass card */}
-        <button
-          type="button"
-          className="home-featured"
-          aria-label="MVMaster Premium"
-          onClick={() => setPremiumOpen(true)}
-        >
-          <div className="home-featured-glow" aria-hidden />
-          <div className="home-featured-row">
-            <div className="home-featured-icon">
-              <Sparkles size={22} />
+        {/* Featured card / Premium activated banner */}
+        {isPremium ? (
+          <div className="home-premium-banner" role="status" aria-live="polite">
+            <div className="home-premium-banner-glow" aria-hidden />
+            <div className="home-premium-banner-row">
+              <div className="home-premium-banner-icon">
+                <Crown size={22} />
+              </div>
+              <div className="home-premium-banner-text">
+                <p className="home-premium-banner-tag">PREMIUM ACTIVATED</p>
+                <h2 className="home-premium-banner-title">selamat menikmati</h2>
+              </div>
             </div>
-            <div className="home-featured-text">
-              <p className="home-featured-tag">MVMaster Premium</p>
-              <h2 className="home-featured-title">Unlock unlimited AI magic</h2>
-              <p className="home-featured-sub">
-                Pro models, 4K exports & priority queue.
-              </p>
-            </div>
-            <ChevronRight size={20} className="home-featured-chev" />
           </div>
-        </button>
+        ) : (
+          <button
+            type="button"
+            className="home-featured"
+            aria-label="MVMaster Premium"
+            onClick={() => setPremiumOpen(true)}
+          >
+            <div className="home-featured-glow" aria-hidden />
+            <div className="home-featured-row">
+              <div className="home-featured-icon">
+                <Sparkles size={22} />
+              </div>
+              <div className="home-featured-text">
+                <p className="home-featured-tag">MVMaster Premium</p>
+                <h2 className="home-featured-title">Unlock unlimited AI magic</h2>
+                <p className="home-featured-sub">
+                  Pro models, 4K exports & priority queue.
+                </p>
+              </div>
+              <ChevronRight size={20} className="home-featured-chev" />
+            </div>
+          </button>
+        )}
 
         {/* Service grid */}
         <section className="home-section" aria-label="Services">
