@@ -11,6 +11,7 @@ import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
+import { usePremiumStatus } from "@/hooks/use-premium-status";
 
 const plans = [
   {
