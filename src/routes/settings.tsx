@@ -204,7 +204,7 @@ function SettingsPage() {
       label: "Manage Premium Subscription",
       desc: premiumLabel,
       Icon: Crown,
-      onClick: () => setPremiumOpen(true),
+      onClick: () => (isPremium ? setPremiumActiveOpen(true) : setPremiumOpen(true)),
     },
     {
       label: "Language",
