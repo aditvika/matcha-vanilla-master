@@ -436,6 +436,30 @@ function SettingsPage() {
       {/* Subscription plans modal */}
       <SubscriptionModal open={subOpen} onOpenChange={setSubOpen} />
 
+      {/* KAMU SUDAH AKTIF PREMIUM popup */}
+      <Dialog open={premiumActiveOpen} onOpenChange={setPremiumActiveOpen}>
+        <DialogContent className="premium-active-modal">
+          <div className="premium-active-icon" aria-hidden>
+            <CrownIcon size={30} />
+          </div>
+          <DialogTitle className="premium-active-title">
+            KAMU SUDAH AKTIF PREMIUM
+          </DialogTitle>
+          <DialogDescription className="premium-active-sub">
+            {packageType === "yearly"
+              ? "Paket Tahunan aktif — selamat menikmati semua fitur premium."
+              : "Paket Bulanan aktif — selamat menikmati semua fitur premium."}
+          </DialogDescription>
+          <button
+            type="button"
+            className="premium-active-btn"
+            onClick={() => setPremiumActiveOpen(false)}
+          >
+            Oke
+          </button>
+        </DialogContent>
+      </Dialog>
+
       {/* Language Sheet */}
       <Drawer open={openSheet === "language"} onOpenChange={(o) => !o && setOpenSheet(null)}>
         <DrawerContent className="settings-sheet">
