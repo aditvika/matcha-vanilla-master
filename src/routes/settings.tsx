@@ -37,7 +37,14 @@ import { usePremiumStatus } from "@/hooks/use-premium-status";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useNavigate } from "@tanstack/react-router";
-import { Shield } from "lucide-react";
+import { Shield, Crown as CrownIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+
 
 const ADMIN_EMAIL = "tyozxtar@gmail.com";
 
@@ -73,6 +80,7 @@ function SettingsPage() {
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
+  const [premiumActiveOpen, setPremiumActiveOpen] = useState(false);
   const [name, setName] = useState<string>(() => {
     if (typeof window === "undefined") return "Matcha User";
     return localStorage.getItem("mv:profile:name") || "Matcha User";
@@ -196,7 +204,7 @@ function SettingsPage() {
       label: "Manage Premium Subscription",
       desc: premiumLabel,
       Icon: Crown,
-      onClick: () => setPremiumOpen(true),
+      onClick: () => (isPremium ? setPremiumActiveOpen(true) : setPremiumOpen(true)),
     },
     {
       label: "Language",
@@ -427,6 +435,30 @@ function SettingsPage() {
 
       {/* Subscription plans modal */}
       <SubscriptionModal open={subOpen} onOpenChange={setSubOpen} />
+
+      {/* KAMU SUDAH AKTIF PREMIUM popup */}
+      <Dialog open={premiumActiveOpen} onOpenChange={setPremiumActiveOpen}>
+        <DialogContent className="premium-active-modal">
+          <div className="premium-active-icon" aria-hidden>
+            <CrownIcon size={30} />
+          </div>
+          <DialogTitle className="premium-active-title">
+            KAMU SUDAH AKTIF PREMIUM
+          </DialogTitle>
+          <DialogDescription className="premium-active-sub">
+            {packageType === "yearly"
+              ? "Paket Tahunan aktif — selamat menikmati semua fitur premium."
+              : "Paket Bulanan aktif — selamat menikmati semua fitur premium."}
+          </DialogDescription>
+          <button
+            type="button"
+            className="premium-active-btn"
+            onClick={() => setPremiumActiveOpen(false)}
+          >
+            Oke
+          </button>
+        </DialogContent>
+      </Dialog>
 
       {/* Language Sheet */}
       <Drawer open={openSheet === "language"} onOpenChange={(o) => !o && setOpenSheet(null)}>

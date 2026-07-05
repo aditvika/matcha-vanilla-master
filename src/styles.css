@@ -1659,3 +1659,150 @@
 
 .mv-premium .settings-item-icon { color: oklch(0.85 0.15 300); }
 
+/* ===== Full purple swap for remaining green surfaces (Premium only) ===== */
+
+/* Settings sheet primary CTA */
+.mv-premium .settings-sheet-primary {
+  background: linear-gradient(135deg, oklch(0.7 0.2 300), oklch(0.5 0.2 295));
+  color: oklch(0.98 0.005 300);
+  box-shadow: 0 8px 24px -8px oklch(0.55 0.22 300 / 0.7);
+}
+.mv-premium .settings-sheet-primary:hover {
+  box-shadow: 0 12px 28px -8px oklch(0.55 0.22 300 / 0.8);
+}
+
+/* Profile avatar */
+.mv-premium .profile-avatar {
+  background: linear-gradient(135deg, oklch(0.7 0.2 300), oklch(0.5 0.2 295));
+  color: oklch(0.98 0.005 300);
+}
+.mv-premium .profile-avatar-edit {
+  background: oklch(0.7 0.2 300);
+  color: oklch(0.98 0.005 300);
+}
+.mv-premium .profile-input { color: oklch(0.96 0.01 300); }
+.mv-premium .profile-input:focus-visible {
+  border-color: oklch(0.75 0.19 300);
+  box-shadow: 0 0 0 3px oklch(0.75 0.19 300 / 0.25);
+}
+
+/* Premium status card */
+.mv-premium .premium-status-icon {
+  background: linear-gradient(135deg, oklch(0.7 0.2 300), oklch(0.5 0.2 295));
+  color: oklch(0.98 0.005 300);
+}
+.mv-premium .premium-status-value { color: oklch(0.96 0.01 300); }
+.mv-premium .premium-card {
+  background:
+    linear-gradient(135deg, oklch(0.7 0.2 300 / 0.14), oklch(0.5 0.2 295 / 0.08)),
+    oklch(0.2 0.02 300 / 0.6);
+  border-color: oklch(0.7 0.2 300 / 0.35);
+}
+.mv-premium .premium-card-header { color: oklch(0.88 0.15 300); }
+.mv-premium .premium-benefits li { color: oklch(0.92 0.03 300); }
+.mv-premium .premium-benefits svg { color: oklch(0.85 0.18 300); }
+
+/* Language list */
+.mv-premium .language-item { color: oklch(0.92 0.02 300); }
+.mv-premium .language-item-active {
+  background: oklch(0.7 0.2 300 / 0.18);
+  border-color: oklch(0.7 0.2 300 / 0.55);
+  color: oklch(0.9 0.16 300);
+}
+.mv-premium .language-item-active svg { color: oklch(0.85 0.18 300); }
+
+/* Subscription plans modal */
+.mv-premium .sub-plan-card:hover { border-color: oklch(0.75 0.18 300 / 0.45); }
+.mv-premium .sub-plan-card-highlighted {
+  background: linear-gradient(135deg, oklch(0.7 0.2 300 / 0.14), oklch(0.5 0.2 295 / 0.08));
+  border-color: oklch(0.75 0.19 300 / 0.5);
+}
+.mv-premium .sub-plan-card-highlighted:hover { border-color: oklch(0.75 0.19 300 / 0.75); }
+.mv-premium .sub-plan-badge {
+  background: linear-gradient(135deg, oklch(0.75 0.19 300), oklch(0.6 0.2 295));
+  color: oklch(0.98 0.005 300);
+}
+.mv-premium .sub-plan-price { color: oklch(0.85 0.17 300); }
+.mv-premium .sub-feature-item { color: oklch(0.92 0.03 300); }
+.mv-premium .sub-feature-item svg { color: oklch(0.85 0.18 300); }
+
+/* Voucher section */
+.mv-premium .voucher-section {
+  background: linear-gradient(180deg, oklch(0.3 0.08 300 / 0.35), oklch(0.22 0.03 300 / 0.6));
+  border-color: oklch(0.85 0.18 300 / 0.2);
+}
+.mv-premium .voucher-input:focus { border-color: oklch(0.78 0.18 300); }
+.mv-premium .voucher-btn {
+  background: linear-gradient(135deg, oklch(0.75 0.19 300), oklch(0.6 0.2 295));
+  color: oklch(0.98 0.005 300);
+}
+
+/* Premium notification modal button */
+.mv-premium .premium-modal-btn {
+  background: linear-gradient(135deg, oklch(0.7 0.2 300), oklch(0.5 0.2 295));
+  color: oklch(0.98 0.005 300);
+}
+.mv-premium .premium-modal-list li::before { color: oklch(0.85 0.18 300); }
+
+/* Auth page accents */
+.mv-premium .auth-primary-btn {
+  background: linear-gradient(135deg, oklch(0.75 0.19 300), oklch(0.6 0.2 295));
+  color: oklch(0.98 0.005 300);
+}
+.mv-premium .auth-switch-btn { color: oklch(0.85 0.16 300); }
+
+/* =====================================================================
+   "KAMU SUDAH AKTIF PREMIUM" popup (always purple)
+   ===================================================================== */
+.premium-active-modal {
+  background: linear-gradient(135deg, oklch(0.22 0.06 300), oklch(0.14 0.04 295)) !important;
+  border: 1px solid oklch(0.75 0.19 300 / 0.4) !important;
+  border-radius: 1.25rem !important;
+  color: oklch(0.98 0.005 300);
+  max-width: 360px !important;
+  padding: 1.75rem 1.5rem !important;
+  box-shadow:
+    0 20px 60px -10px oklch(0 0 0 / 0.6),
+    0 0 40px oklch(0.7 0.2 300 / 0.35);
+  text-align: center;
+}
+.premium-active-icon {
+  width: 64px; height: 64px;
+  margin: 0 auto 1rem;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, oklch(0.7 0.2 300), oklch(0.5 0.2 295));
+  color: oklch(0.98 0.005 300);
+  box-shadow: 0 0 30px oklch(0.7 0.2 300 / 0.55);
+}
+.premium-active-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: oklch(0.98 0.005 300);
+  text-align: center;
+}
+.premium-active-sub {
+  margin: 0 0 1.25rem;
+  font-size: 0.88rem;
+  color: oklch(0.85 0.08 300);
+  text-align: center;
+}
+.premium-active-btn {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 0.9rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: oklch(0.98 0.005 300);
+  background: linear-gradient(135deg, oklch(0.7 0.2 300), oklch(0.5 0.2 295));
+  box-shadow: 0 8px 24px -8px oklch(0.55 0.22 300 / 0.7);
+  transition: transform 0.15s ease;
+}
+.premium-active-btn:hover { transform: translateY(-1px); }
+.premium-active-btn:active { transform: scale(0.98); }
+
+
