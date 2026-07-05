@@ -37,7 +37,14 @@ import { usePremiumStatus } from "@/hooks/use-premium-status";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useNavigate } from "@tanstack/react-router";
-import { Shield } from "lucide-react";
+import { Shield, Crown as CrownIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+
 
 const ADMIN_EMAIL = "tyozxtar@gmail.com";
 
