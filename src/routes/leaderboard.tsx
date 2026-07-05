@@ -63,7 +63,10 @@ function LeaderboardPage() {
           </div>
 
           <ul className="lb-list">
-            {leaderboardFull[leaderTab].slice(0, 20).map((entry, i) => {
+            {[...leaderboardFull[leaderTab]]
+              .sort((a, b) => b.mvp - a.mvp)
+              .slice(0, 20)
+              .map((entry, i) => {
               const { Icon, cls } = rankMeta(i);
               const initials = getInitials(entry.name);
               return (
