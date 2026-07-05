@@ -80,6 +80,7 @@ function SettingsPage() {
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
+  const [premiumActiveOpen, setPremiumActiveOpen] = useState(false);
   const [name, setName] = useState<string>(() => {
     if (typeof window === "undefined") return "Matcha User";
     return localStorage.getItem("mv:profile:name") || "Matcha User";
