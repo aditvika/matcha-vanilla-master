@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 
 import { SupabaseSessionProvider } from "@/hooks/use-supabase-session";
+import { SelectedMediaProvider } from "@/hooks/use-selected-media";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -141,7 +142,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SupabaseSessionProvider onAuthChange={handleAuthChange}>
-        <Outlet />
+        <SelectedMediaProvider>
+          <Outlet />
+        </SelectedMediaProvider>
       </SupabaseSessionProvider>
     </QueryClientProvider>
   );

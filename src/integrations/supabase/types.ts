@@ -17,33 +17,51 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          daily_photo_count: number
+          daily_video_count: number
           display_name: string | null
           email: string | null
           id: string
           is_premium: boolean
+          last_active_server_date: string | null
+          monthly_video_count_premium: number
           package_type: string | null
           premium_until: string | null
+          total_mvp_points: number
           updated_at: string
+          weekly_video_count_premium: number
         }
         Insert: {
           created_at?: string
+          daily_photo_count?: number
+          daily_video_count?: number
           display_name?: string | null
           email?: string | null
           id: string
           is_premium?: boolean
+          last_active_server_date?: string | null
+          monthly_video_count_premium?: number
           package_type?: string | null
           premium_until?: string | null
+          total_mvp_points?: number
           updated_at?: string
+          weekly_video_count_premium?: number
         }
         Update: {
           created_at?: string
+          daily_photo_count?: number
+          daily_video_count?: number
           display_name?: string | null
           email?: string | null
           id?: string
           is_premium?: boolean
+          last_active_server_date?: string | null
+          monthly_video_count_premium?: number
           package_type?: string | null
           premium_until?: string | null
+          total_mvp_points?: number
           updated_at?: string
+          weekly_video_count_premium?: number
         }
         Relationships: []
       }
@@ -83,6 +101,8 @@ export type Database = {
     }
     Functions: {
       claim_voucher: { Args: { p_code: string }; Returns: Json }
+      get_server_date: { Args: never; Returns: string }
+      reset_daily_counts_if_new_day: { Args: never; Returns: Json }
     }
     Enums: {
       [_ in never]: never
