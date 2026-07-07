@@ -131,7 +131,7 @@ function HomePage() {
     if (!file) return;
     setMedia(file, kind);
     e.target.value = "";
-    void navigate({ to: "/home" });
+    void navigate({ to: "/preview" });
   };
 
   const openNotifications = () => {
