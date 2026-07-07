@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useRef, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useSelectedMedia } from "@/hooks/use-selected-media";
 import {
   Bell,
   Wand2,
@@ -114,6 +115,24 @@ function HomePage() {
   const [subOpen, setSubOpen] = useState(false);
   const [leaderTab, setLeaderTab] = useState<LeaderTab>("Bulanan");
   const { isPremium } = usePremiumStatus();
+  const { setMedia } = useSelectedMedia();
+  const navigate = useNavigate();
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleServiceClick = (label: string) => {
+    if (label === "Face Swap") return setFaceSwapOpen(true);
+    if (label === "Enhance Photo") return photoInputRef.current?.click();
+    if (label === "Upscale Video") return videoInputRef.current?.click();
+  };
+
+  const handleFilePicked = (kind: "photo" | "video") => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMedia(file, kind);
+    e.target.value = "";
+    void navigate({ to: "/home" });
+  };
 
   const openNotifications = () => {
     setNotifOpen(true);
@@ -193,7 +212,7 @@ function HomePage() {
                 key={label}
                 type="button"
                 className="home-card"
-                onClick={label === "Face Swap" ? () => setFaceSwapOpen(true) : undefined}
+                onClick={() => handleServiceClick(label)}
               >
                 <div className="home-card-icon">
                   <Icon size={24} />
@@ -202,6 +221,20 @@ function HomePage() {
               </button>
             ))}
           </div>
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleFilePicked("photo")}
+          />
+          <input
+            ref={videoInputRef}
+            type="file"
+            accept="video/*"
+            hidden
+            onChange={handleFilePicked("video")}
+          />
         </section>
 
         {/* Premium Leaderboard */}
