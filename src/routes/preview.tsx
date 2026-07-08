@@ -78,6 +78,48 @@ function PreviewPage() {
     void navigate({ to: "/home" });
   };
 
+  const handleProcess = async () => {
+    if (!selected || processing) return;
+    // Safeguard: free users hitting a restricted tier
+    const restrictedForFree =
+      !isPremium &&
+      (selected === "2K" || selected === "4K" || (isVideo && selected === "1080p"));
+    if (restrictedForFree) {
+      setPremiumOpen(true);
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      if (!isPremium) {
+        const kind = isVideo ? "video" : "photo";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (supabase.rpc as any)("consume_daily_credit", { p_kind: kind });
+        if (error) {
+          toast.error("Could not verify credits. Please try again.");
+          setProcessing(false);
+          return;
+        }
+        const res = data as { success: boolean; reason?: string; limit?: number };
+        if (!res?.success) {
+          const limit = res?.limit ?? (isVideo ? 3 : 5);
+          toast.error(
+            isVideo
+              ? `Daily video limit reached (${limit}/day). Upgrade to Premium for more.`
+              : `Daily photo limit reached (${limit}/day). Upgrade to Premium for more.`,
+            { duration: 5000 },
+          );
+          setProcessing(false);
+          return;
+        }
+      }
+      void navigate({ to: "/processing", search: { resolution: selected } });
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+      setProcessing(false);
+    }
+  };
+
   return (
     <main className="preview-root">
       <div className="preview-glow preview-glow-a" aria-hidden />
