@@ -5,6 +5,8 @@ import { useSelectedMedia } from "@/hooks/use-selected-media";
 import { usePremiumStatus } from "@/hooks/use-premium-status";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/preview")({
   head: () => ({
@@ -30,6 +32,7 @@ function PreviewPage() {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (!media) void navigate({ to: "/home", replace: true });
@@ -138,10 +141,10 @@ function PreviewPage() {
         <button
           type="button"
           className="preview-cta"
-          disabled={!selected}
-          onClick={() => selected && void 0}
+          disabled={!selected || processing}
+          onClick={() => void handleProcess()}
         >
-          {selected ? `Process at ${selected}` : "Choose a resolution"}
+          {processing ? "Starting..." : selected ? `Process at ${selected}` : "Choose a resolution"}
         </button>
       </section>
 
