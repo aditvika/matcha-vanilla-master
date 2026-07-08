@@ -5,6 +5,8 @@ import { useSelectedMedia } from "@/hooks/use-selected-media";
 import { usePremiumStatus } from "@/hooks/use-premium-status";
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/preview")({
   head: () => ({
@@ -30,6 +32,7 @@ function PreviewPage() {
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     if (!media) void navigate({ to: "/home", replace: true });
@@ -73,6 +76,48 @@ function PreviewPage() {
   const goBack = () => {
     clear();
     void navigate({ to: "/home" });
+  };
+
+  const handleProcess = async () => {
+    if (!selected || processing) return;
+    // Safeguard: free users hitting a restricted tier
+    const restrictedForFree =
+      !isPremium &&
+      (selected === "2K" || selected === "4K" || (isVideo && selected === "1080p"));
+    if (restrictedForFree) {
+      setPremiumOpen(true);
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      if (!isPremium) {
+        const kind = isVideo ? "video" : "photo";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (supabase.rpc as any)("consume_daily_credit", { p_kind: kind });
+        if (error) {
+          toast.error("Could not verify credits. Please try again.");
+          setProcessing(false);
+          return;
+        }
+        const res = data as { success: boolean; reason?: string; limit?: number };
+        if (!res?.success) {
+          const limit = res?.limit ?? (isVideo ? 3 : 5);
+          toast.error(
+            isVideo
+              ? `Daily video limit reached (${limit}/day). Upgrade to Premium for more.`
+              : `Daily photo limit reached (${limit}/day). Upgrade to Premium for more.`,
+            { duration: 5000 },
+          );
+          setProcessing(false);
+          return;
+        }
+      }
+      void navigate({ to: "/processing", search: { resolution: selected } });
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+      setProcessing(false);
+    }
   };
 
   return (
@@ -138,10 +183,10 @@ function PreviewPage() {
         <button
           type="button"
           className="preview-cta"
-          disabled={!selected}
-          onClick={() => selected && void 0}
+          disabled={!selected || processing}
+          onClick={() => void handleProcess()}
         >
-          {selected ? `Process at ${selected}` : "Choose a resolution"}
+          {processing ? "Starting..." : selected ? `Process at ${selected}` : "Choose a resolution"}
         </button>
       </section>
 

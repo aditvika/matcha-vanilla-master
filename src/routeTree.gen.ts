@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ResultRouteImport } from './routes/result'
+import { Route as ProcessingRouteImport } from './routes/processing'
 import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as HomeRouteImport } from './routes/home'
@@ -20,6 +22,16 @@ import { Route as IndexRouteImport } from './routes/index'
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResultRoute = ResultRouteImport.update({
+  id: '/result',
+  path: '/result',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProcessingRoute = ProcessingRouteImport.update({
+  id: '/processing',
+  path: '/processing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PreviewRoute = PreviewRouteImport.update({
@@ -60,6 +72,8 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/leaderboard': typeof LeaderboardRoute
   '/preview': typeof PreviewRoute
+  '/processing': typeof ProcessingRoute
+  '/result': typeof ResultRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +83,8 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/leaderboard': typeof LeaderboardRoute
   '/preview': typeof PreviewRoute
+  '/processing': typeof ProcessingRoute
+  '/result': typeof ResultRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
@@ -79,6 +95,8 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/leaderboard': typeof LeaderboardRoute
   '/preview': typeof PreviewRoute
+  '/processing': typeof ProcessingRoute
+  '/result': typeof ResultRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +108,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/leaderboard'
     | '/preview'
+    | '/processing'
+    | '/result'
     | '/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +119,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/leaderboard'
     | '/preview'
+    | '/processing'
+    | '/result'
     | '/settings'
   id:
     | '__root__'
@@ -108,6 +130,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/leaderboard'
     | '/preview'
+    | '/processing'
+    | '/result'
     | '/settings'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +142,8 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   LeaderboardRoute: typeof LeaderboardRoute
   PreviewRoute: typeof PreviewRoute
+  ProcessingRoute: typeof ProcessingRoute
+  ResultRoute: typeof ResultRoute
   SettingsRoute: typeof SettingsRoute
 }
 
@@ -128,6 +154,20 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/result': {
+      id: '/result'
+      path: '/result'
+      fullPath: '/result'
+      preLoaderRoute: typeof ResultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/processing': {
+      id: '/processing'
+      path: '/processing'
+      fullPath: '/processing'
+      preLoaderRoute: typeof ProcessingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/preview': {
@@ -182,6 +222,8 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   LeaderboardRoute: LeaderboardRoute,
   PreviewRoute: PreviewRoute,
+  ProcessingRoute: ProcessingRoute,
+  ResultRoute: ResultRoute,
   SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
