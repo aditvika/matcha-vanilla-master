@@ -101,6 +101,7 @@ export type Database = {
     }
     Functions: {
       claim_voucher: { Args: { p_code: string }; Returns: Json }
+      consume_daily_credit: { Args: { p_kind: string }; Returns: Json }
       get_server_date: { Args: never; Returns: string }
       reset_daily_counts_if_new_day: { Args: never; Returns: Json }
     }
