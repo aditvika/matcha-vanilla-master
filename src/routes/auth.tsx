@@ -23,7 +23,7 @@ function AuthPage() {
 
   useEffect(() => {
     if (!loading && session) {
-      navigate({ to: "/settings", replace: true });
+      navigate({ to: "/home", replace: true });
     }
   }, [loading, session, navigate]);
 
