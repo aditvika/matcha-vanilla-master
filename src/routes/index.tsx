@@ -91,15 +91,24 @@ function SplashScreen() {
   const navigate = useNavigate();
   const { session, loading } = useSupabaseSession();
 
+  // Safety net: never freeze on the splash screen while the session resolves.
+  useEffect(() => {
+    const safety = setTimeout(() => {
+      navigate({ to: session ? "/home" : "/auth", replace: true });
+    }, 3000);
+    return () => clearTimeout(safety);
+  }, [navigate, session]);
+
   useEffect(() => {
     if (loading) return;
     if (session) {
       navigate({ to: "/home", replace: true });
       return;
     }
-    const t = setTimeout(() => navigate({ to: "/home", replace: true }), 2600);
+    const t = setTimeout(() => navigate({ to: "/auth", replace: true }), 2600);
     return () => clearTimeout(t);
   }, [loading, navigate, session]);
+
 
   return (
     <main className="splash-root">
