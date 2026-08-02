@@ -141,7 +141,7 @@ function SettingsPage() {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${window.location.origin}/settings` },
+        options: { emailRedirectTo: window.location.origin },
       });
       if (error) throw error;
       toast.success("Magic link sent! Check your inbox.");
