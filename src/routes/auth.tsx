@@ -92,9 +92,12 @@ function AuthPage() {
 
       <div className="home-content home-fade-in">
         <header className="home-header">
-          <Link to="/home" className="home-icon-btn" aria-label="Back">
-            <ArrowLeft size={20} />
-          </Link>
+          {session ? (
+            <Link to="/home" className="home-icon-btn" aria-label="Back">
+              <ArrowLeft size={20} />
+            </Link>
+          ) : null}
+
           <div>
             <p className="home-greet-eyebrow">Account</p>
             <h1 className="home-greet">{mode === "signin" ? "Sign In" : "Create Account"}</h1>
