@@ -27,6 +27,19 @@ function AuthPage() {
     }
   }, [loading, session, navigate]);
 
+  // Trap the system/browser Back button while unauthenticated so guests
+  // cannot navigate back into protected screens.
+  useEffect(() => {
+    if (loading || session) return;
+    window.history.pushState({ authGuard: true }, "");
+    const onPop = () => {
+      window.history.pushState({ authGuard: true }, "");
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [loading, session]);
+
+
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -79,9 +92,12 @@ function AuthPage() {
 
       <div className="home-content home-fade-in">
         <header className="home-header">
-          <Link to="/home" className="home-icon-btn" aria-label="Back">
-            <ArrowLeft size={20} />
-          </Link>
+          {session ? (
+            <Link to="/home" className="home-icon-btn" aria-label="Back">
+              <ArrowLeft size={20} />
+            </Link>
+          ) : null}
+
           <div>
             <p className="home-greet-eyebrow">Account</p>
             <h1 className="home-greet">{mode === "signin" ? "Sign In" : "Create Account"}</h1>

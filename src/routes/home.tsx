@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSelectedMedia } from "@/hooks/use-selected-media";
 import {
@@ -47,7 +48,11 @@ export const Route = createFileRoute("/home")({
       },
     ],
   }),
-  component: HomePage,
+  component: () => (
+    <RequireAuth>
+      <HomePage />
+    </RequireAuth>
+  ),
 });
 
 type Service = {

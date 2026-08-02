@@ -1,3 +1,4 @@
+import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -58,7 +59,11 @@ export const Route = createFileRoute("/settings")({
       },
     ],
   }),
-  component: SettingsPage,
+  component: () => (
+    <RequireAuth>
+      <SettingsPage />
+    </RequireAuth>
+  ),
 });
 
 type SheetKey = "profile" | "premium" | "language" | null;

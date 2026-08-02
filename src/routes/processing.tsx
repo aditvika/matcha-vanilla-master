@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { Zap, Loader2 } from "lucide-react";
@@ -17,7 +18,11 @@ export const Route = createFileRoute("/processing")({
       { name: "description", content: "Your media is being processed." },
     ],
   }),
-  component: ProcessingPage,
+  component: () => (
+    <RequireAuth>
+      <ProcessingPage />
+    </RequireAuth>
+  ),
 });
 
 const FREE_MESSAGES = [
