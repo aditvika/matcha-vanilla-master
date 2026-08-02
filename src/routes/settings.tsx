@@ -141,7 +141,7 @@ function SettingsPage() {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: `${window.location.origin}/settings` },
+        options: { emailRedirectTo: window.location.origin },
       });
       if (error) throw error;
       toast.success("Magic link sent! Check your inbox.");
@@ -159,7 +159,7 @@ function SettingsPage() {
     setGoogleLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: `${window.location.origin}/auth`,
+        redirect_uri: window.location.origin,
       });
       if (result.error) throw result.error;
       if (!result.redirected) toast.success("Welcome!");
