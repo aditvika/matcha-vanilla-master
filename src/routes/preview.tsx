@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Lock, Sparkles, Wand2, Video } from "lucide-react";
 import { useSelectedMedia } from "@/hooks/use-selected-media";
@@ -15,7 +16,11 @@ export const Route = createFileRoute("/preview")({
       { name: "description", content: "Preview your selected media and choose an output resolution." },
     ],
   }),
-  component: PreviewPage,
+  component: () => (
+    <RequireAuth>
+      <PreviewPage />
+    </RequireAuth>
+  ),
 });
 
 type Option = {

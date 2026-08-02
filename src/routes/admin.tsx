@@ -1,3 +1,4 @@
+import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,7 +17,11 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [{ title: "Admin — Matcha Vanilla Production" }],
   }),
-  component: AdminPage,
+  component: () => (
+    <RequireAuth>
+      <AdminPage />
+    </RequireAuth>
+  ),
 });
 
 function useNow(intervalMs = 60_000) {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Crown, Medal, Award, Trophy } from "lucide-react";
 import { leaderboardFull, getInitials, type LeaderTab } from "@/lib/leaderboard-data";
@@ -16,7 +17,11 @@ export const Route = createFileRoute("/leaderboard")({
     const tab = s.tab as LeaderTab | undefined;
     return { tab: tab === "Tahunan" || tab === "Mix" ? tab : "Bulanan" };
   },
-  component: LeaderboardPage,
+  component: () => (
+    <RequireAuth>
+      <LeaderboardPage />
+    </RequireAuth>
+  ),
 });
 
 function rankMeta(i: number) {

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { ArrowLeft, Download, CheckCircle2 } from "lucide-react";
@@ -15,7 +16,11 @@ export const Route = createFileRoute("/result")({
       { name: "description", content: "Your processed media is ready." },
     ],
   }),
-  component: ResultPage,
+  component: () => (
+    <RequireAuth>
+      <ResultPage />
+    </RequireAuth>
+  ),
 });
 
 function ResultPage() {
