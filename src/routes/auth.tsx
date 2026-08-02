@@ -27,6 +27,19 @@ function AuthPage() {
     }
   }, [loading, session, navigate]);
 
+  // Trap the system/browser Back button while unauthenticated so guests
+  // cannot navigate back into protected screens.
+  useEffect(() => {
+    if (loading || session) return;
+    window.history.pushState({ authGuard: true }, "");
+    const onPop = () => {
+      window.history.pushState({ authGuard: true }, "");
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [loading, session]);
+
+
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
