@@ -44,15 +44,19 @@ function AuthPage() {
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const cleanEmail = email.trim().toLowerCase();
-    // RFC-style practical email validation
-    const emailOk = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/.test(cleanEmail) && cleanEmail.length <= 255;
-    if (!emailOk) {
-      toast.error("Please enter a valid email address.");
+    const check = validateEmail(email);
+    if (!check.ok) {
+      toast.error(
+        check.reason === "disposable"
+          ? "Gunakan email asli/valid yang terdaftar!"
+          : "Gunakan email asli/valid yang terdaftar!",
+      );
       return;
     }
+    const cleanEmail = check.email;
+
     if (password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
+      toast.error("Password minimal 6 karakter.");
       return;
     }
 
@@ -66,58 +70,81 @@ function AuthPage() {
         });
         if (error) {
           const m = error.message.toLowerCase();
-          if (m.includes("already") || m.includes("registered")) {
-            toast.error("This email is already registered. Please sign in instead.");
+          if (m.includes("already") || m.includes("registered") || m.includes("exists")) {
+            toast.error("Akun telah terdaftar sebelumnya. Silakan Sign In.");
             setMode("signin");
             return;
           }
           throw error;
         }
-        if (data.session) {
-          toast.success("Account created! You're signed in.");
-        } else {
-          toast.success("Account created! Check your inbox to confirm, then sign in.");
-          setMode("signin");
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password,
-        });
-        if (error) {
-          const m = error.message.toLowerCase();
-          if (m.includes("not confirmed")) {
-            toast.error("Please confirm your email first, then sign in.");
-            return;
-          }
-          if (m.includes("invalid login credentials")) {
-            let exists = true;
-            try {
-              const res = await emailExists({ data: { email: cleanEmail } });
-              exists = res.exists;
-            } catch {
-              exists = true;
-            }
-            toast.error(
-              exists
-                ? "Invalid password. Please try again."
-                : "Account not found. Please sign up first.",
-            );
-            if (!exists) setMode("signup");
-            return;
-          }
 
-          throw error;
+        // Supabase returns an obfuscated user with no identities when the email exists.
+        if (data.user && (data.user.identities?.length ?? 0) === 0) {
+          toast.error("Akun telah terdaftar sebelumnya. Silakan Sign In.");
+          setMode("signin");
+          return;
         }
-        toast.success("Welcome back!");
+
+        if (!data.session) {
+          // Email confirmation still on: try to establish the session directly.
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: cleanEmail,
+            password,
+          });
+          if (signInError) {
+            toast.success("Akun berhasil didaftarkan! Cek inbox untuk konfirmasi, lalu Sign In.");
+            setMode("signin");
+            return;
+          }
+        }
+
+        toast.success("Akun berhasil didaftarkan! Selamat datang di MV Master");
+        navigate({ to: "/home", replace: true });
+        return;
       }
+
+      // ---- Sign in ----
+      let registered = true;
+      try {
+        const res = await emailExists({ data: { email: cleanEmail } });
+        registered = res.exists;
+      } catch {
+        registered = true;
+      }
+      if (!registered) {
+        toast.error(
+          "Akun tidak ditemukan atau belum terdaftar. Silakan lakukan pendaftaran (Sign Up) terlebih dahulu.",
+        );
+        setMode("signup");
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+      if (error) {
+        const m = error.message.toLowerCase();
+        if (m.includes("not confirmed")) {
+          toast.error("Email belum dikonfirmasi. Silakan cek inbox terlebih dahulu.");
+          return;
+        }
+        if (m.includes("invalid login credentials")) {
+          toast.error("Password salah. Silakan coba lagi.");
+          return;
+        }
+        throw error;
+      }
+      toast.success("Selamat datang kembali!");
+      navigate({ to: "/home", replace: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      const msg = err instanceof Error ? err.message : "Terjadi kesalahan. Silakan coba lagi.";
       toast.error(msg);
     } finally {
       setBusy(false);
     }
   };
+
 
 
   const handleGoogle = async () => {
