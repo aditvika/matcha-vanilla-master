@@ -90,19 +90,22 @@ function AuthPage() {
             return;
           }
           if (m.includes("invalid login credentials")) {
-            // Distinguish "no account" from "wrong password" without leaking data
-            // beyond what the user asked for.
-            const { error: otpError } = await supabase.auth.signInWithOtp({
-              email: cleanEmail,
-              options: { shouldCreateUser: false },
-            });
-            if (otpError && /signups? not allowed|not found/i.test(otpError.message)) {
-              toast.error("Account not found. Please sign up first.");
-            } else {
-              toast.error("Invalid password. Please try again.");
+            let exists = true;
+            try {
+              const res = await emailExists({ data: { email: cleanEmail } });
+              exists = res.exists;
+            } catch {
+              exists = true;
             }
+            toast.error(
+              exists
+                ? "Invalid password. Please try again."
+                : "Account not found. Please sign up first.",
+            );
+            if (!exists) setMode("signup");
             return;
           }
+
           throw error;
         }
         toast.success("Welcome back!");
