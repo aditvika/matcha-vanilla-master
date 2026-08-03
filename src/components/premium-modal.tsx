@@ -10,7 +10,10 @@ import {
 export function PremiumModal({ open, onOpenChange, onUnderstand }: { open: boolean; onOpenChange: (v: boolean) => void; onUnderstand?: () => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="premium-modal-content">
+      <DialogContent
+        className="premium-modal-content"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="premium-modal-title">Fitur Premium MVMaster</DialogTitle>
           <DialogDescription className="premium-modal-desc" asChild>

@@ -57,7 +57,7 @@ function AuthPage() {
     const cleanEmail = check.email;
 
     if (password.length < 6) {
-      toast.error("Password minimal 6 karakter.");
+      toast.error("Password minimal harus 6 karakter!");
       return;
     }
 
@@ -86,23 +86,19 @@ function AuthPage() {
           return;
         }
 
-        if (!data.session) {
-          // Email confirmation still on: try to establish the session directly.
-          const { error: signInError } = await supabase.auth.signInWithPassword({
-            email: cleanEmail,
-            password,
-          });
-          if (signInError) {
-            toast.success("Akun berhasil didaftarkan! Cek inbox untuk konfirmasi, lalu Sign In.");
-            setMode("signin");
-            return;
-          }
+        // Never auto-login an unverified account: sign out any partial session
+        // and keep the user on this screen until they confirm via email.
+        if (data.session) {
+          await supabase.auth.signOut();
         }
-
-        toast.success("Akun berhasil didaftarkan! Selamat datang di MV Master");
-        navigate({ to: "/home", replace: true });
+        toast.success(
+          "Kode/Link verifikasi telah dikirim ke email kamu. Silakan cek inbox untuk verifikasi!",
+        );
+        setPassword("");
+        setMode("signin");
         return;
       }
+
 
       // ---- Sign in ----
       let registered = true;
@@ -114,11 +110,12 @@ function AuthPage() {
       }
       if (!registered) {
         toast.error(
-          "Akun tidak ditemukan atau belum terdaftar. Silakan lakukan pendaftaran (Sign Up) terlebih dahulu.",
+          "Akun tidak ditemukan atau belum terdaftar. Silakan Sign Up terlebih dahulu.",
         );
         setMode("signup");
         return;
       }
+
 
       const { error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,

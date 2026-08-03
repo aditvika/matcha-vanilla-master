@@ -1054,8 +1054,11 @@
   border: 1px solid oklch(1 0 0 / 0.1) !important;
   border-radius: 1.25rem !important;
   color: oklch(0.96 0.005 90);
-  max-width: 480px !important;
+  width: calc(100vw - 2rem) !important;
+  max-width: min(480px, 90vw) !important;
   max-height: 85vh;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
   padding: 1.5rem !important;
   gap: 1rem !important;
   overflow-y: auto;
@@ -1126,8 +1129,11 @@
   border: 1px solid oklch(1 0 0 / 0.1) !important;
   border-radius: 1.25rem !important;
   color: oklch(0.96 0.005 90);
-  max-width: 480px !important;
+  width: calc(100vw - 2rem) !important;
+  max-width: min(480px, 90vw) !important;
   max-height: 90vh;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
   padding: 1.5rem !important;
   gap: 1.25rem !important;
   overflow-y: auto;
@@ -1420,7 +1426,11 @@
   color: oklch(0.96 0.005 90);
   font-size: 0.9rem; font-weight: 600; margin: 0 0 0.6rem;
 }
-.voucher-row { display: flex; gap: 8px; }
+.voucher-row { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 380px) {
+  .voucher-row { flex-direction: column; }
+  .voucher-btn { width: 100%; }
+}
 .voucher-input {
   flex: 1; min-width: 0;
   padding: 0.7rem 0.9rem;

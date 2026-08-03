@@ -85,7 +85,10 @@ export function SubscriptionModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="subscription-modal-content">
+      <DialogContent
+        className="subscription-modal-content"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="subscription-modal-title">
             Pilih Paket Premium Kamu 🚀
