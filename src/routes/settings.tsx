@@ -134,6 +134,8 @@ function SettingsPage() {
       toast.error("Failed to sign out");
     }
     setOpenSheet(null);
+    // Replace history so Back cannot return into protected screens.
+    navigate({ to: "/auth", replace: true });
   };
 
   const handleSendMagicLink = async () => {
