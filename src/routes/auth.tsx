@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
+import { emailExists } from "@/lib/auth-check.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
