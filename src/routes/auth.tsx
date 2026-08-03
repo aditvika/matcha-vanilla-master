@@ -110,11 +110,12 @@ function AuthPage() {
       }
       if (!registered) {
         toast.error(
-          "Akun tidak ditemukan atau belum terdaftar. Silakan lakukan pendaftaran (Sign Up) terlebih dahulu.",
+          "Akun tidak ditemukan atau belum terdaftar. Silakan Sign Up terlebih dahulu.",
         );
         setMode("signup");
         return;
       }
+
 
       const { error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
