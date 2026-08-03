@@ -42,31 +42,79 @@ function AuthPage() {
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const cleanEmail = email.trim().toLowerCase();
+    // RFC-style practical email validation
+    const emailOk = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/.test(cleanEmail) && cleanEmail.length <= 255;
+    if (!emailOk) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
           password,
           options: { emailRedirectTo: window.location.origin },
         });
-        if (error) throw error;
-        toast.success("Account created!");
+        if (error) {
+          const m = error.message.toLowerCase();
+          if (m.includes("already") || m.includes("registered")) {
+            toast.error("This email is already registered. Please sign in instead.");
+            setMode("signin");
+            return;
+          }
+          throw error;
+        }
+        if (data.session) {
+          toast.success("Account created! You're signed in.");
+        } else {
+          toast.success("Account created! Check your inbox to confirm, then sign in.");
+          setMode("signin");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          email: cleanEmail,
           password,
         });
-        if (error) throw error;
+        if (error) {
+          const m = error.message.toLowerCase();
+          if (m.includes("not confirmed")) {
+            toast.error("Please confirm your email first, then sign in.");
+            return;
+          }
+          if (m.includes("invalid login credentials")) {
+            // Distinguish "no account" from "wrong password" without leaking data
+            // beyond what the user asked for.
+            const { error: otpError } = await supabase.auth.signInWithOtp({
+              email: cleanEmail,
+              options: { shouldCreateUser: false },
+            });
+            if (otpError && /signups? not allowed|not found/i.test(otpError.message)) {
+              toast.error("Account not found. Please sign up first.");
+            } else {
+              toast.error("Invalid password. Please try again.");
+            }
+            return;
+          }
+          throw error;
+        }
         toast.success("Welcome back!");
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed";
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
       toast.error(msg);
     } finally {
       setBusy(false);
     }
   };
+
 
   const handleGoogle = async () => {
     setBusy(true);
