@@ -7,6 +7,7 @@ import { lovable } from "@/integrations/lovable";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
 import { emailExists } from "@/lib/auth-check.functions";
 import { validateEmail } from "@/lib/email-validation";
+import { useI18n } from "@/hooks/use-i18n";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const { session, loading } = useSupabaseSession();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
@@ -44,14 +46,12 @@ function AuthPage() {
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (busy) return;
 
     const check = validateEmail(email);
     if (!check.ok) {
-      toast.error(
-        check.reason === "disposable"
-          ? "Gunakan email asli/valid yang terdaftar!"
-          : "Gunakan email asli/valid yang terdaftar!",
-      );
+      toast.error("Gunakan email asli/valid yang terdaftar!");
       return;
     }
     const cleanEmail = check.email;
@@ -62,6 +62,8 @@ function AuthPage() {
     }
 
     setBusy(true);
+    // Hard safety net: never let the button stay stuck if a network call hangs.
+    const release = setTimeout(() => setBusy(false), 20000);
     try {
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
@@ -99,11 +101,14 @@ function AuthPage() {
         return;
       }
 
-
       // ---- Sign in ----
+      // Best-effort existence check; never block sign-in if it is slow or fails.
       let registered = true;
       try {
-        const res = await emailExists({ data: { email: cleanEmail } });
+        const res = (await Promise.race([
+          emailExists({ data: { email: cleanEmail } }),
+          new Promise((resolve) => setTimeout(() => resolve({ exists: true }), 6000)),
+        ])) as { exists: boolean };
         registered = res.exists;
       } catch {
         registered = true;
@@ -115,7 +120,6 @@ function AuthPage() {
         setMode("signup");
         return;
       }
-
 
       const { error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
@@ -136,16 +140,25 @@ function AuthPage() {
       toast.success("Selamat datang kembali!");
       navigate({ to: "/home", replace: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Terjadi kesalahan. Silakan coba lagi.";
-      toast.error(msg);
+      console.error("[auth]", err);
+      const raw = err instanceof Error ? err.message : "";
+      const network = /fetch|network|failed to|timeout/i.test(raw);
+      toast.error(
+        network || !raw
+          ? "Gagal menghubungkan ke server, silakan coba lagi."
+          : raw,
+      );
     } finally {
+      clearTimeout(release);
       setBusy(false);
     }
   };
 
 
 
+
   const handleGoogle = async () => {
+    if (busy) return;
     setBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
@@ -156,8 +169,9 @@ function AuthPage() {
       // Session was set in-place (preview popup flow) — go straight to Home.
       navigate({ to: "/home", replace: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Google sign-in failed";
-      toast.error(msg);
+      console.error("[auth:google]", err);
+      toast.error("Gagal menghubungkan ke server, silakan coba lagi.");
+    } finally {
       setBusy(false);
     }
   };
@@ -176,8 +190,10 @@ function AuthPage() {
           ) : null}
 
           <div>
-            <p className="home-greet-eyebrow">Account</p>
-            <h1 className="home-greet">{mode === "signin" ? "Sign In" : "Create Account"}</h1>
+            <p className="home-greet-eyebrow">{t("auth.eyebrow")}</p>
+            <h1 className="home-greet">
+              {mode === "signin" ? t("auth.signIn") : t("auth.createAccount")}
+            </h1>
           </div>
         </header>
 
@@ -188,7 +204,7 @@ function AuthPage() {
               <input
                 type="email"
                 required
-                placeholder="Email"
+                placeholder={t("auth.email")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -199,14 +215,20 @@ function AuthPage() {
                 type="password"
                 required
                 minLength={6}
-                placeholder="Password"
+                placeholder={t("auth.password")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </label>
             <button type="submit" className="auth-primary-btn" disabled={busy}>
               <LogIn size={16} />
-              <span>{mode === "signin" ? "Sign In" : "Create Account"}</span>
+              <span>
+                {busy
+                  ? t("auth.working")
+                  : mode === "signin"
+                    ? t("auth.signIn")
+                    : t("auth.createAccount")}
+              </span>
             </button>
           </form>
 
@@ -224,7 +246,7 @@ function AuthPage() {
               <path fill="#FBBC05" d="M5.4 14.3l-.7.5-2.3 1.8C3.9 19.9 7.7 22 12 22c2.6 0 4.8-.9 6.4-2.3l-3.6-2.8c-1 .7-2.3 1.2-2.8 1.2-2.6 0-4.8-1.7-5.6-4.1z"/>
               <path fill="#34A853" d="M12 21.6c2.6 0 4.8-.9 6.4-2.3l-3.6-2.8c-1 .7-2.3 1.1-2.8 1.1-2.6 0-4.8-1.7-5.6-4.1l-3 2.3C5 19.5 8.2 21.6 12 21.6z"/>
             </svg>
-            <span>Continue with Google</span>
+            <span>{t("auth.google")}</span>
           </button>
 
           <button
@@ -232,9 +254,7 @@ function AuthPage() {
             className="auth-switch-btn"
             onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
           >
-            {mode === "signin"
-              ? "Don't have an account? Sign up"
-              : "Already have an account? Sign in"}
+            {mode === "signin" ? t("auth.toSignup") : t("auth.toSignin")}
           </button>
         </section>
       </div>

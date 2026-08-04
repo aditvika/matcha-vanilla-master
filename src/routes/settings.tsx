@@ -35,6 +35,7 @@ import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
 import { usePremiumStatus } from "@/hooks/use-premium-status";
+import { useI18n } from "@/hooks/use-i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useNavigate } from "@tanstack/react-router";
@@ -68,18 +69,14 @@ export const Route = createFileRoute("/settings")({
 
 type SheetKey = "profile" | "premium" | "language" | null;
 
-const LANGUAGES = [
-  { code: "en-US", label: "English (US)" },
-  { code: "en-GB", label: "English (UK)" },
-  { code: "es-ES", label: "Español" },
-  { code: "fr-FR", label: "Français" },
-  { code: "de-DE", label: "Deutsch" },
-  { code: "ja-JP", label: "日本語" },
-  { code: "vi-VN", label: "Tiếng Việt" },
+const LANGUAGES: Array<{ code: "en" | "id"; label: string }> = [
+  { code: "en", label: "English" },
+  { code: "id", label: "Bahasa Indonesia" },
 ];
 
 function SettingsPage() {
   const navigate = useNavigate();
+  const { t, lang, setLang } = useI18n();
   const { user: supaUser, loading: authLoading } = useSupabaseSession();
   void authLoading;
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
@@ -97,13 +94,12 @@ function SettingsPage() {
   const [emailInput, setEmailInput] = useState<string>("");
   const [sendingLink, setSendingLink] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [language, setLanguage] = useState("en-US");
   const { isPremium, packageType } = usePremiumStatus();
   const premiumLabel = isPremium
     ? packageType === "yearly"
-      ? "Premium Active - Tahunan"
-      : "Premium Active - Bulanan"
-    : "Free Plan";
+      ? t("settings.premiumYearly")
+      : t("settings.premiumMonthly")
+    : t("settings.freePlan");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isLoggedIn = !!supaUser;
@@ -126,14 +122,23 @@ function SettingsPage() {
   };
 
   const handleLogout = async () => {
+    setOpenSheet(null);
     try {
       await supabase.auth.signOut();
-      toast.success("Signed out");
+      // Clear every cached credential/profile artifact left behind.
+      try {
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith("sb-") || k.startsWith("mv:profile"))
+          .forEach((k) => localStorage.removeItem(k));
+        sessionStorage.clear();
+      } catch {
+        /* storage may be unavailable */
+      }
+      toast.success(t("settings.signedOut"));
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to sign out");
+      console.error("[settings:logout]", err);
+      toast.error(t("settings.signOutFailed"));
     }
-    setOpenSheet(null);
     // Replace history so Back cannot return into protected screens.
     navigate({ to: "/auth", replace: true });
   };
@@ -180,7 +185,7 @@ function SettingsPage() {
   };
 
 
-  const currentLangLabel = LANGUAGES.find((l) => l.code === language)?.label ?? "English (US)";
+  const currentLangLabel = LANGUAGES.find((l) => l.code === lang)?.label ?? "English";
 
   const items: Array<{
     label: string;
@@ -193,8 +198,8 @@ function SettingsPage() {
     ...(userEmail.toLowerCase() === ADMIN_EMAIL
       ? [
           {
-            label: "Admin Dashboard",
-            desc: "Manage vouchers & subscribers",
+            label: t("settings.admin"),
+            desc: t("settings.adminDesc"),
             Icon: Shield,
             onClick: () => navigate({ to: "/admin" }),
             isAdmin: true,
@@ -202,26 +207,26 @@ function SettingsPage() {
         ]
       : []),
     {
-      label: "Account Profile",
-      desc: "Name, email and avatar",
+      label: t("settings.profile"),
+      desc: t("settings.profileDesc"),
       Icon: UserCircle2,
       onClick: () => setOpenSheet("profile"),
     },
     {
-      label: "Manage Premium Subscription",
+      label: t("settings.premium"),
       desc: premiumLabel,
       Icon: Crown,
       onClick: () => (isPremium ? setPremiumActiveOpen(true) : setPremiumOpen(true)),
     },
     {
-      label: "Language",
+      label: t("settings.language"),
       desc: currentLangLabel,
       Icon: Languages,
       onClick: () => setOpenSheet("language"),
     },
     {
-      label: "Privacy Policy",
-      desc: "Opens in a new tab",
+      label: t("settings.privacy"),
+      desc: t("settings.privacyDesc"),
       Icon: ShieldCheck,
       onClick: () => {
         window.open("https://www.privacypolicies.com/live/sample", "_blank", "noopener,noreferrer");
@@ -238,8 +243,8 @@ function SettingsPage() {
       <div className="home-content home-fade-in">
         <header className="home-header">
           <div>
-            <p className="home-greet-eyebrow">Preferences</p>
-            <h1 className="home-greet">Settings</h1>
+            <p className="home-greet-eyebrow">{t("settings.eyebrow")}</p>
+            <h1 className="home-greet">{t("settings.title")}</h1>
           </div>
         </header>
 
@@ -269,9 +274,9 @@ function SettingsPage() {
             ))}
           </ul>
 
-          <button type="button" className="settings-logout">
+          <button type="button" className="settings-logout" onClick={handleLogout}>
             <LogOut size={18} />
-            <span>Log out</span>
+            <span>{t("settings.logout")}</span>
           </button>
         </section>
       </div>
@@ -283,7 +288,7 @@ function SettingsPage() {
           activeProps={{ className: "home-nav-item home-nav-active" }}
         >
           <HomeIcon size={22} />
-          <span>Home</span>
+          <span>{t("nav.home")}</span>
         </Link>
         <Link to="/home" className="home-nav-item home-nav-create">
           <Plus size={26} />
@@ -294,7 +299,7 @@ function SettingsPage() {
           activeProps={{ className: "home-nav-item home-nav-active" }}
         >
           <SettingsIcon size={22} />
-          <span>Settings</span>
+          <span>{t("nav.settings")}</span>
         </Link>
       </nav>
 
@@ -302,9 +307,9 @@ function SettingsPage() {
       <Drawer open={openSheet === "profile"} onOpenChange={(o) => !o && setOpenSheet(null)}>
         <DrawerContent className="settings-sheet">
           <DrawerHeader className="settings-sheet-header">
-            <DrawerTitle className="settings-sheet-title">Account Profile</DrawerTitle>
+            <DrawerTitle className="settings-sheet-title">{t("settings.profile")}</DrawerTitle>
             <DrawerDescription className="settings-sheet-desc">
-              Update your personal information
+              {t("settings.profileSheetDesc")}
             </DrawerDescription>
           </DrawerHeader>
 
@@ -344,7 +349,7 @@ function SettingsPage() {
             </div>
 
             <div className="profile-field">
-              <Label htmlFor="profile-name" className="profile-label">Name</Label>
+              <Label htmlFor="profile-name" className="profile-label">{t("settings.name")}</Label>
               <Input
                 id="profile-name"
                 value={name}
@@ -356,7 +361,7 @@ function SettingsPage() {
 
             {isLoggedIn ? (
               <div className="profile-field">
-                <Label className="profile-label">Account</Label>
+                <Label className="profile-label">{t("settings.account")}</Label>
                 <div className="profile-email-display">
                   <Mail size={16} />
                   <span>{userEmail}</span>
@@ -417,7 +422,7 @@ function SettingsPage() {
               className="settings-sheet-primary"
               onClick={() => setOpenSheet(null)}
             >
-              Save Changes
+              {t("common.save")}
             </button>
             {isLoggedIn && (
               <button
@@ -426,7 +431,7 @@ function SettingsPage() {
                 onClick={handleLogout}
               >
                 <LogOut size={16} />
-                <span>Log Out</span>
+                <span>{t("settings.logout")}</span>
               </button>
             )}
           </DrawerFooter>
@@ -471,27 +476,27 @@ function SettingsPage() {
       <Drawer open={openSheet === "language"} onOpenChange={(o) => !o && setOpenSheet(null)}>
         <DrawerContent className="settings-sheet">
           <DrawerHeader className="settings-sheet-header">
-            <DrawerTitle className="settings-sheet-title">Language</DrawerTitle>
+            <DrawerTitle className="settings-sheet-title">{t("settings.language")}</DrawerTitle>
             <DrawerDescription className="settings-sheet-desc">
-              Choose your preferred language
+              {t("settings.languageDesc")}
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="settings-sheet-body">
             <ul className="language-list">
-              {LANGUAGES.map((lang) => {
-                const selected = lang.code === language;
+              {LANGUAGES.map((option) => {
+                const selected = option.code === lang;
                 return (
-                  <li key={lang.code}>
+                  <li key={option.code}>
                     <button
                       type="button"
                       className={`language-item${selected ? " language-item-active" : ""}`}
                       onClick={() => {
-                        setLanguage(lang.code);
+                        setLang(option.code);
                         setOpenSheet(null);
                       }}
                     >
-                      <span>{lang.label}</span>
+                      <span>{option.label}</span>
                       {selected && <Check size={18} />}
                     </button>
                   </li>
