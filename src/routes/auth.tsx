@@ -246,7 +246,7 @@ function AuthPage() {
               <path fill="#FBBC05" d="M5.4 14.3l-.7.5-2.3 1.8C3.9 19.9 7.7 22 12 22c2.6 0 4.8-.9 6.4-2.3l-3.6-2.8c-1 .7-2.3 1.2-2.8 1.2-2.6 0-4.8-1.7-5.6-4.1z"/>
               <path fill="#34A853" d="M12 21.6c2.6 0 4.8-.9 6.4-2.3l-3.6-2.8c-1 .7-2.3 1.1-2.8 1.1-2.6 0-4.8-1.7-5.6-4.1l-3 2.3C5 19.5 8.2 21.6 12 21.6z"/>
             </svg>
-            <span>Continue with Google</span>
+            <span>{t("auth.google")}</span>
           </button>
 
           <button
@@ -254,9 +254,7 @@ function AuthPage() {
             className="auth-switch-btn"
             onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
           >
-            {mode === "signin"
-              ? "Don't have an account? Sign up"
-              : "Already have an account? Sign in"}
+            {mode === "signin" ? t("auth.toSignup") : t("auth.toSignin")}
           </button>
         </section>
       </div>
