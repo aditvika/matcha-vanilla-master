@@ -243,8 +243,8 @@ function SettingsPage() {
       <div className="home-content home-fade-in">
         <header className="home-header">
           <div>
-            <p className="home-greet-eyebrow">Preferences</p>
-            <h1 className="home-greet">Settings</h1>
+            <p className="home-greet-eyebrow">{t("settings.eyebrow")}</p>
+            <h1 className="home-greet">{t("settings.title")}</h1>
           </div>
         </header>
 
