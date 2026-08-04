@@ -274,9 +274,9 @@ function SettingsPage() {
             ))}
           </ul>
 
-          <button type="button" className="settings-logout">
+          <button type="button" className="settings-logout" onClick={handleLogout}>
             <LogOut size={18} />
-            <span>Log out</span>
+            <span>{t("settings.logout")}</span>
           </button>
         </section>
       </div>
