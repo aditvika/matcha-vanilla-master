@@ -37,6 +37,7 @@ import {
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
 import { usePremiumStatus } from "@/hooks/use-premium-status";
+import { useI18n } from "@/hooks/use-i18n";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -57,14 +58,15 @@ export const Route = createFileRoute("/home")({
 
 type Service = {
   label: string;
+  key: string;
   Icon: typeof Wand2;
 };
 
 const services: Service[] = [
-  { label: "Enhance Photo", Icon: Wand2 },
-  { label: "Face Swap", Icon: UserRoundCog },
-  { label: "Upscale Video", Icon: Video },
-  { label: "Project History", Icon: FolderOpen },
+  { label: "Enhance Photo", key: "svc.enhancePhoto", Icon: Wand2 },
+  { label: "Face Swap", key: "svc.faceSwap", Icon: UserRoundCog },
+  { label: "Upscale Video", key: "svc.upscaleVideo", Icon: Video },
+  { label: "Project History", key: "svc.projectHistory", Icon: FolderOpen },
 ];
 
 type Notification = {
@@ -120,6 +122,7 @@ function HomePage() {
   const [subOpen, setSubOpen] = useState(false);
   const [leaderTab, setLeaderTab] = useState<LeaderTab>("Bulanan");
   const { isPremium } = usePremiumStatus();
+  const { t } = useI18n();
   const { setMedia } = useSelectedMedia();
   const navigate = useNavigate();
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -153,12 +156,12 @@ function HomePage() {
         {/* Header */}
         <header className="home-header">
           <div>
-            <p className="home-greet-eyebrow">Welcome back</p>
-            <h1 className="home-greet">Hello, User!</h1>
+            <p className="home-greet-eyebrow">{t("home.welcome")}</p>
+            <h1 className="home-greet">{t("home.hello")}</h1>
           </div>
           <button
             className="home-bell"
-            aria-label="Notifications"
+            aria-label={t("home.notifications")}
             type="button"
             onClick={openNotifications}
           >
@@ -176,8 +179,8 @@ function HomePage() {
                 <Crown size={22} />
               </div>
               <div className="home-premium-banner-text">
-                <p className="home-premium-banner-tag">PREMIUM ACTIVATED</p>
-                <h2 className="home-premium-banner-title">selamat menikmati</h2>
+                <p className="home-premium-banner-tag">{t("home.premiumActive")}</p>
+                <h2 className="home-premium-banner-title">{t("home.premiumActiveSub")}</h2>
               </div>
             </div>
           </div>
@@ -194,11 +197,9 @@ function HomePage() {
                 <Sparkles size={22} />
               </div>
               <div className="home-featured-text">
-                <p className="home-featured-tag">MVMaster Premium</p>
-                <h2 className="home-featured-title">Unlock unlimited AI magic</h2>
-                <p className="home-featured-sub">
-                  Pro models, 4K exports & priority queue.
-                </p>
+                <p className="home-featured-tag">{t("home.premiumTag")}</p>
+                <h2 className="home-featured-title">{t("home.premiumTitle")}</h2>
+                <p className="home-featured-sub">{t("home.premiumSub")}</p>
               </div>
               <ChevronRight size={20} className="home-featured-chev" />
             </div>
@@ -208,11 +209,11 @@ function HomePage() {
         {/* Service grid */}
         <section className="home-section" aria-label="Services">
           <div className="home-section-head">
-            <h3 className="home-section-title">Services</h3>
-            <span className="home-section-link">See all</span>
+            <h3 className="home-section-title">{t("home.services")}</h3>
+            <span className="home-section-link">{t("common.seeAll")}</span>
           </div>
           <div className="home-grid">
-            {services.map(({ label, Icon }) => (
+            {services.map(({ label, key, Icon }) => (
               <button
                 key={label}
                 type="button"
@@ -222,7 +223,7 @@ function HomePage() {
                 <div className="home-card-icon">
                   <Icon size={24} />
                 </div>
-                <span className="home-card-label">{label}</span>
+                <span className="home-card-label">{t(key)}</span>
               </button>
             ))}
           </div>
@@ -245,8 +246,8 @@ function HomePage() {
         {/* Premium Leaderboard */}
         <section className="home-section" aria-label="Premium Leaderboard">
           <div className="home-section-head">
-            <h3 className="home-section-title">Premium Leaderboard</h3>
-            <Link to="/leaderboard" search={{ tab: leaderTab }} className="home-section-link">See all</Link>
+            <h3 className="home-section-title">{t("home.leaderboard")}</h3>
+            <Link to="/leaderboard" search={{ tab: leaderTab }} className="home-section-link">{t("common.seeAll")}</Link>
           </div>
 
           <div className="lb-tabs" role="tablist">
@@ -295,7 +296,7 @@ function HomePage() {
           activeProps={{ className: "home-nav-item home-nav-active" }}
         >
           <HomeIcon size={22} />
-          <span>Home</span>
+          <span>{t("nav.home")}</span>
         </Link>
         <Link to="/home" className="home-nav-item home-nav-create">
           <Plus size={26} />
@@ -306,7 +307,7 @@ function HomePage() {
           activeProps={{ className: "home-nav-item home-nav-active" }}
         >
           <Settings size={22} />
-          <span>Settings</span>
+          <span>{t("nav.settings")}</span>
         </Link>
       </nav>
 
@@ -314,9 +315,9 @@ function HomePage() {
       <Dialog open={faceSwapOpen} onOpenChange={setFaceSwapOpen}>
         <DialogContent className="coming-soon-dialog-content">
           <DialogHeader>
-            <DialogTitle className="coming-soon-dialog-title">Coming Soon!</DialogTitle>
+            <DialogTitle className="coming-soon-dialog-title">{t("home.comingSoon")}</DialogTitle>
             <DialogDescription className="coming-soon-dialog-desc">
-              We will bring this feature to you very soon.
+              {t("home.comingSoonBody")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -325,7 +326,7 @@ function HomePage() {
               className="coming-soon-dialog-btn"
               onClick={() => setFaceSwapOpen(false)}
             >
-              Got it
+              {t("common.gotIt")}
             </button>
           </DialogFooter>
         </DialogContent>
@@ -335,9 +336,9 @@ function HomePage() {
       <Drawer open={notifOpen} onOpenChange={setNotifOpen}>
         <DrawerContent className="notif-sheet">
           <DrawerHeader className="notif-sheet-header">
-            <DrawerTitle className="notif-sheet-title">Notifications</DrawerTitle>
+            <DrawerTitle className="notif-sheet-title">{t("home.notifications")}</DrawerTitle>
             <DrawerDescription className="notif-sheet-sub">
-              Updates from your AI studio
+              {t("home.notifSub")}
             </DrawerDescription>
           </DrawerHeader>
           <ul className="notif-list">
