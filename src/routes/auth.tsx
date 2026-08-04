@@ -44,14 +44,12 @@ function AuthPage() {
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (busy) return;
 
     const check = validateEmail(email);
     if (!check.ok) {
-      toast.error(
-        check.reason === "disposable"
-          ? "Gunakan email asli/valid yang terdaftar!"
-          : "Gunakan email asli/valid yang terdaftar!",
-      );
+      toast.error("Gunakan email asli/valid yang terdaftar!");
       return;
     }
     const cleanEmail = check.email;
@@ -62,6 +60,8 @@ function AuthPage() {
     }
 
     setBusy(true);
+    // Hard safety net: never let the button stay stuck if a network call hangs.
+    const release = setTimeout(() => setBusy(false), 20000);
     try {
       if (mode === "signup") {
         const { data, error } = await supabase.auth.signUp({
@@ -99,11 +99,14 @@ function AuthPage() {
         return;
       }
 
-
       // ---- Sign in ----
+      // Best-effort existence check; never block sign-in if it is slow or fails.
       let registered = true;
       try {
-        const res = await emailExists({ data: { email: cleanEmail } });
+        const res = (await Promise.race([
+          emailExists({ data: { email: cleanEmail } }),
+          new Promise((resolve) => setTimeout(() => resolve({ exists: true }), 6000)),
+        ])) as { exists: boolean };
         registered = res.exists;
       } catch {
         registered = true;
@@ -115,7 +118,6 @@ function AuthPage() {
         setMode("signup");
         return;
       }
-
 
       const { error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
@@ -136,12 +138,20 @@ function AuthPage() {
       toast.success("Selamat datang kembali!");
       navigate({ to: "/home", replace: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Terjadi kesalahan. Silakan coba lagi.";
-      toast.error(msg);
+      console.error("[auth]", err);
+      const raw = err instanceof Error ? err.message : "";
+      const network = /fetch|network|failed to|timeout/i.test(raw);
+      toast.error(
+        network || !raw
+          ? "Gagal menghubungkan ke server, silakan coba lagi."
+          : raw,
+      );
     } finally {
+      clearTimeout(release);
       setBusy(false);
     }
   };
+
 
 
 
