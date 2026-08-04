@@ -156,6 +156,7 @@ function AuthPage() {
 
 
   const handleGoogle = async () => {
+    if (busy) return;
     setBusy(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
@@ -166,8 +167,9 @@ function AuthPage() {
       // Session was set in-place (preview popup flow) — go straight to Home.
       navigate({ to: "/home", replace: true });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Google sign-in failed";
-      toast.error(msg);
+      console.error("[auth:google]", err);
+      toast.error("Gagal menghubungkan ke server, silakan coba lagi.");
+    } finally {
       setBusy(false);
     }
   };
