@@ -68,18 +68,14 @@ export const Route = createFileRoute("/settings")({
 
 type SheetKey = "profile" | "premium" | "language" | null;
 
-const LANGUAGES = [
-  { code: "en-US", label: "English (US)" },
-  { code: "en-GB", label: "English (UK)" },
-  { code: "es-ES", label: "Español" },
-  { code: "fr-FR", label: "Français" },
-  { code: "de-DE", label: "Deutsch" },
-  { code: "ja-JP", label: "日本語" },
-  { code: "vi-VN", label: "Tiếng Việt" },
+const LANGUAGES: Array<{ code: "en" | "id"; label: string }> = [
+  { code: "en", label: "English" },
+  { code: "id", label: "Bahasa Indonesia" },
 ];
 
 function SettingsPage() {
   const navigate = useNavigate();
+  const { t, lang, setLang } = useI18n();
   const { user: supaUser, loading: authLoading } = useSupabaseSession();
   void authLoading;
   const [openSheet, setOpenSheet] = useState<SheetKey>(null);
@@ -97,13 +93,12 @@ function SettingsPage() {
   const [emailInput, setEmailInput] = useState<string>("");
   const [sendingLink, setSendingLink] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [language, setLanguage] = useState("en-US");
   const { isPremium, packageType } = usePremiumStatus();
   const premiumLabel = isPremium
     ? packageType === "yearly"
-      ? "Premium Active - Tahunan"
-      : "Premium Active - Bulanan"
-    : "Free Plan";
+      ? t("settings.premiumYearly")
+      : t("settings.premiumMonthly")
+    : t("settings.freePlan");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isLoggedIn = !!supaUser;
