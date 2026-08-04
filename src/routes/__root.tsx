@@ -143,11 +143,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SupabaseSessionProvider onAuthChange={handleAuthChange}>
-        <SelectedMediaProvider>
-          <Outlet />
-        </SelectedMediaProvider>
-      </SupabaseSessionProvider>
+      <I18nProvider>
+        <SupabaseSessionProvider onAuthChange={handleAuthChange}>
+          <SelectedMediaProvider>
+            <Outlet />
+            <Toaster position="top-center" richColors />
+          </SelectedMediaProvider>
+        </SupabaseSessionProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 }
