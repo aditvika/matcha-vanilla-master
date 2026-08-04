@@ -184,7 +184,7 @@ function SettingsPage() {
   };
 
 
-  const currentLangLabel = LANGUAGES.find((l) => l.code === language)?.label ?? "English (US)";
+  const currentLangLabel = LANGUAGES.find((l) => l.code === lang)?.label ?? "English";
 
   const items: Array<{
     label: string;
@@ -197,8 +197,8 @@ function SettingsPage() {
     ...(userEmail.toLowerCase() === ADMIN_EMAIL
       ? [
           {
-            label: "Admin Dashboard",
-            desc: "Manage vouchers & subscribers",
+            label: t("settings.admin"),
+            desc: t("settings.adminDesc"),
             Icon: Shield,
             onClick: () => navigate({ to: "/admin" }),
             isAdmin: true,
@@ -206,26 +206,26 @@ function SettingsPage() {
         ]
       : []),
     {
-      label: "Account Profile",
-      desc: "Name, email and avatar",
+      label: t("settings.profile"),
+      desc: t("settings.profileDesc"),
       Icon: UserCircle2,
       onClick: () => setOpenSheet("profile"),
     },
     {
-      label: "Manage Premium Subscription",
+      label: t("settings.premium"),
       desc: premiumLabel,
       Icon: Crown,
       onClick: () => (isPremium ? setPremiumActiveOpen(true) : setPremiumOpen(true)),
     },
     {
-      label: "Language",
+      label: t("settings.language"),
       desc: currentLangLabel,
       Icon: Languages,
       onClick: () => setOpenSheet("language"),
     },
     {
-      label: "Privacy Policy",
-      desc: "Opens in a new tab",
+      label: t("settings.privacy"),
+      desc: t("settings.privacyDesc"),
       Icon: ShieldCheck,
       onClick: () => {
         window.open("https://www.privacypolicies.com/live/sample", "_blank", "noopener,noreferrer");
