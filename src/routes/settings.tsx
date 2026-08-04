@@ -349,7 +349,7 @@ function SettingsPage() {
             </div>
 
             <div className="profile-field">
-              <Label htmlFor="profile-name" className="profile-label">Name</Label>
+              <Label htmlFor="profile-name" className="profile-label">{t("settings.name")}</Label>
               <Input
                 id="profile-name"
                 value={name}
@@ -361,7 +361,7 @@ function SettingsPage() {
 
             {isLoggedIn ? (
               <div className="profile-field">
-                <Label className="profile-label">Account</Label>
+                <Label className="profile-label">{t("settings.account")}</Label>
                 <div className="profile-email-display">
                   <Mail size={16} />
                   <span>{userEmail}</span>
@@ -422,7 +422,7 @@ function SettingsPage() {
               className="settings-sheet-primary"
               onClick={() => setOpenSheet(null)}
             >
-              Save Changes
+              {t("common.save")}
             </button>
             {isLoggedIn && (
               <button
@@ -431,7 +431,7 @@ function SettingsPage() {
                 onClick={handleLogout}
               >
                 <LogOut size={16} />
-                <span>Log Out</span>
+                <span>{t("settings.logout")}</span>
               </button>
             )}
           </DrawerFooter>
