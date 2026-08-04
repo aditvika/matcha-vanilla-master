@@ -475,27 +475,27 @@ function SettingsPage() {
       <Drawer open={openSheet === "language"} onOpenChange={(o) => !o && setOpenSheet(null)}>
         <DrawerContent className="settings-sheet">
           <DrawerHeader className="settings-sheet-header">
-            <DrawerTitle className="settings-sheet-title">Language</DrawerTitle>
+            <DrawerTitle className="settings-sheet-title">{t("settings.language")}</DrawerTitle>
             <DrawerDescription className="settings-sheet-desc">
-              Choose your preferred language
+              {t("settings.languageDesc")}
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="settings-sheet-body">
             <ul className="language-list">
-              {LANGUAGES.map((lang) => {
-                const selected = lang.code === language;
+              {LANGUAGES.map((option) => {
+                const selected = option.code === lang;
                 return (
-                  <li key={lang.code}>
+                  <li key={option.code}>
                     <button
                       type="button"
                       className={`language-item${selected ? " language-item-active" : ""}`}
                       onClick={() => {
-                        setLanguage(lang.code);
+                        setLang(option.code);
                         setOpenSheet(null);
                       }}
                     >
-                      <span>{lang.label}</span>
+                      <span>{option.label}</span>
                       {selected && <Check size={18} />}
                     </button>
                   </li>
