@@ -11,6 +11,8 @@ import {
 
 import { SupabaseSessionProvider } from "@/hooks/use-supabase-session";
 import { SelectedMediaProvider } from "@/hooks/use-selected-media";
+import { I18nProvider } from "@/hooks/use-i18n";
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
