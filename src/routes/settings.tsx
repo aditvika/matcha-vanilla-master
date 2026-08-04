@@ -299,7 +299,7 @@ function SettingsPage() {
           activeProps={{ className: "home-nav-item home-nav-active" }}
         >
           <SettingsIcon size={22} />
-          <span>Settings</span>
+          <span>{t("nav.settings")}</span>
         </Link>
       </nav>
 
@@ -307,9 +307,9 @@ function SettingsPage() {
       <Drawer open={openSheet === "profile"} onOpenChange={(o) => !o && setOpenSheet(null)}>
         <DrawerContent className="settings-sheet">
           <DrawerHeader className="settings-sheet-header">
-            <DrawerTitle className="settings-sheet-title">Account Profile</DrawerTitle>
+            <DrawerTitle className="settings-sheet-title">{t("settings.profile")}</DrawerTitle>
             <DrawerDescription className="settings-sheet-desc">
-              Update your personal information
+              {t("settings.profileSheetDesc")}
             </DrawerDescription>
           </DrawerHeader>
 
