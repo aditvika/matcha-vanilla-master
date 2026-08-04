@@ -7,6 +7,7 @@ import { lovable } from "@/integrations/lovable";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
 import { emailExists } from "@/lib/auth-check.functions";
 import { validateEmail } from "@/lib/email-validation";
+import { useI18n } from "@/hooks/use-i18n";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
