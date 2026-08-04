@@ -188,8 +188,10 @@ function AuthPage() {
           ) : null}
 
           <div>
-            <p className="home-greet-eyebrow">Account</p>
-            <h1 className="home-greet">{mode === "signin" ? "Sign In" : "Create Account"}</h1>
+            <p className="home-greet-eyebrow">{t("auth.eyebrow")}</p>
+            <h1 className="home-greet">
+              {mode === "signin" ? t("auth.signIn") : t("auth.createAccount")}
+            </h1>
           </div>
         </header>
 
@@ -200,7 +202,7 @@ function AuthPage() {
               <input
                 type="email"
                 required
-                placeholder="Email"
+                placeholder={t("auth.email")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -211,14 +213,20 @@ function AuthPage() {
                 type="password"
                 required
                 minLength={6}
-                placeholder="Password"
+                placeholder={t("auth.password")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </label>
             <button type="submit" className="auth-primary-btn" disabled={busy}>
               <LogIn size={16} />
-              <span>{mode === "signin" ? "Sign In" : "Create Account"}</span>
+              <span>
+                {busy
+                  ? t("auth.working")
+                  : mode === "signin"
+                    ? t("auth.signIn")
+                    : t("auth.createAccount")}
+              </span>
             </button>
           </form>
 
