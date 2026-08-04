@@ -121,14 +121,23 @@ function SettingsPage() {
   };
 
   const handleLogout = async () => {
+    setOpenSheet(null);
     try {
       await supabase.auth.signOut();
-      toast.success("Signed out");
+      // Clear every cached credential/profile artifact left behind.
+      try {
+        Object.keys(localStorage)
+          .filter((k) => k.startsWith("sb-") || k.startsWith("mv:profile"))
+          .forEach((k) => localStorage.removeItem(k));
+        sessionStorage.clear();
+      } catch {
+        /* storage may be unavailable */
+      }
+      toast.success(t("settings.signedOut"));
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to sign out");
+      console.error("[settings:logout]", err);
+      toast.error(t("settings.signOutFailed"));
     }
-    setOpenSheet(null);
     // Replace history so Back cannot return into protected screens.
     navigate({ to: "/auth", replace: true });
   };
