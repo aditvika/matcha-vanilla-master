@@ -288,7 +288,7 @@ function SettingsPage() {
           activeProps={{ className: "home-nav-item home-nav-active" }}
         >
           <HomeIcon size={22} />
-          <span>Home</span>
+          <span>{t("nav.home")}</span>
         </Link>
         <Link to="/home" className="home-nav-item home-nav-create">
           <Plus size={26} />
