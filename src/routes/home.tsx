@@ -243,6 +243,10 @@ function HomePage() {
           />
         </section>
 
+        <QuotaPanel />
+
+
+
         {/* Premium Leaderboard */}
         <section className="home-section" aria-label="Premium Leaderboard">
           <div className="home-section-head">
