@@ -33,6 +33,8 @@ type Option = {
 function PreviewPage() {
   const { media, clear } = useSelectedMedia();
   const { isPremium } = usePremiumStatus();
+  const { find, refresh: refreshQuota } = useQuota();
+
   const navigate = useNavigate();
   const [premiumOpen, setPremiumOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
