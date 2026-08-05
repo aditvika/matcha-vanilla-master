@@ -35,6 +35,9 @@ const en: Dict = {
   "svc.projectHistory": "Project History",
   "home.comingSoon": "Coming Soon!",
   "home.comingSoonBody": "We will bring this feature to you very soon.",
+  "home.quotaButton": "Quota & Plan",
+  "quota.title": "Your Quota",
+  "quota.desc": "Remaining credits and reset timer",
   // settings
   "settings.eyebrow": "Preferences",
   "settings.title": "Settings",
