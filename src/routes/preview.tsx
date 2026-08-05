@@ -4,6 +4,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Lock, Sparkles, Wand2, Video } from "lucide-react";
 import { useSelectedMedia } from "@/hooks/use-selected-media";
 import { usePremiumStatus } from "@/hooks/use-premium-status";
+import { useQuota } from "@/hooks/use-quota";
+
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
 import { supabase } from "@/integrations/supabase/client";
