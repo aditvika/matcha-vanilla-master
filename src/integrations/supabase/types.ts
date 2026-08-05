@@ -26,6 +26,7 @@ export type Database = {
           last_active_server_date: string | null
           monthly_video_count_premium: number
           package_type: string | null
+          premium_started_at: string | null
           premium_until: string | null
           total_mvp_points: number
           updated_at: string
@@ -42,6 +43,7 @@ export type Database = {
           last_active_server_date?: string | null
           monthly_video_count_premium?: number
           package_type?: string | null
+          premium_started_at?: string | null
           premium_until?: string | null
           total_mvp_points?: number
           updated_at?: string
@@ -58,10 +60,44 @@ export type Database = {
           last_active_server_date?: string | null
           monthly_video_count_premium?: number
           package_type?: string | null
+          premium_started_at?: string | null
           premium_until?: string | null
           total_mvp_points?: number
           updated_at?: string
           weekly_video_count_premium?: number
+        }
+        Relationships: []
+      }
+      quota_usage: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: string
+          period_end: string
+          period_start: string
+          updated_at: string
+          used_count: number
+          user_id: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: string
+          period_end: string
+          period_start: string
+          updated_at?: string
+          used_count?: number
+          user_id: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          updated_at?: string
+          used_count?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -102,7 +138,27 @@ export type Database = {
     Functions: {
       claim_voucher: { Args: { p_code: string }; Returns: Json }
       consume_daily_credit: { Args: { p_kind: string }; Returns: Json }
+      consume_quota: {
+        Args: { p_kind: string; p_resolution: string }
+        Returns: Json
+      }
+      get_quota_status: { Args: never; Returns: Json }
       get_server_date: { Args: never; Returns: string }
+      quota_limit: {
+        Args: { _kind: string; _resolution: string; _tier: string }
+        Returns: {
+          bucket: string
+          max_uses: number
+        }[]
+      }
+      quota_window: {
+        Args: { _user_id: string }
+        Returns: {
+          period_end: string
+          period_start: string
+          tier: string
+        }[]
+      }
       reset_daily_counts_if_new_day: { Args: never; Returns: Json }
     }
     Enums: {
