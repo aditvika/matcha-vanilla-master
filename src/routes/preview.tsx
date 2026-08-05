@@ -85,38 +85,43 @@ function PreviewPage() {
 
   const handleProcess = async () => {
     if (!selected || processing) return;
-    // Safeguard: free users hitting a restricted tier
-    const restrictedForFree =
-      !isPremium &&
-      (selected === "2K" || selected === "4K" || (isVideo && selected === "1080p"));
-    if (restrictedForFree) {
-      setPremiumOpen(true);
-      return;
-    }
 
     setProcessing(true);
     try {
-      if (!isPremium) {
-        const kind = isVideo ? "video" : "photo";
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data, error } = await (supabase.rpc as any)("consume_daily_credit", { p_kind: kind });
-        if (error) {
-          toast.error("Could not verify credits. Please try again.");
-          setProcessing(false);
-          return;
-        }
-        const res = data as { success: boolean; reason?: string; limit?: number };
-        if (!res?.success) {
-          const limit = res?.limit ?? (isVideo ? 3 : 5);
+      const kind = isVideo ? "video" : "photo";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.rpc as any)("consume_quota", {
+        p_kind: kind,
+        p_resolution: selected,
+      });
+      if (error) {
+        toast.error("Could not verify your quota. Please try again.");
+        setProcessing(false);
+        return;
+      }
+      const res = data as {
+        success: boolean;
+        reason?: string;
+        limit?: number;
+        remaining?: number;
+        period_end?: string;
+      };
+      if (!res?.success) {
+        if (res?.reason === "LOCKED") {
+          setPremiumOpen(true);
+        } else {
           toast.error(
             isVideo
-              ? `Daily video limit reached (${limit}/day). Upgrade to Premium for more.`
-              : `Daily photo limit reached (${limit}/day). Upgrade to Premium for more.`,
-            { duration: 5000 },
+              ? `Video quota used up (${res?.limit ?? 0} per period). Upgrade or redeem a voucher for more.`
+              : `Photo quota used up (${res?.limit ?? 0} per period). Upgrade or redeem a voucher for more.`,
+            {
+              duration: 6000,
+              action: { label: "Upgrade", onClick: () => setSubOpen(true) },
+            },
           );
-          setProcessing(false);
-          return;
         }
+        setProcessing(false);
+        return;
       }
       void navigate({ to: "/processing", search: { resolution: selected } });
     } catch {
@@ -124,6 +129,7 @@ function PreviewPage() {
       setProcessing(false);
     }
   };
+
 
   return (
     <main className="preview-root">
