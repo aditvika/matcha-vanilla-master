@@ -125,7 +125,9 @@ function PreviewPage() {
         setProcessing(false);
         return;
       }
+      void refreshQuota();
       void navigate({ to: "/processing", search: { resolution: selected } });
+
     } catch {
       toast.error("Something went wrong. Please try again.");
       setProcessing(false);
