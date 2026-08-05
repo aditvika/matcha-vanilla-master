@@ -47,26 +47,24 @@ function PreviewPage() {
 
   const isVideo = media.kind === "video";
 
-  const photoOptions: Option[] = [
-    { key: "720p", label: "720p", sub: isPremium ? "Premium" : "5× Daily Limit", locked: false },
-    { key: "1080p", label: "1080p", sub: isPremium ? "Premium" : "5× Daily Limit", locked: false },
-    { key: "2K", label: "2K", sub: isPremium ? "Ultra HD" : "Premium Only", locked: !isPremium },
-    { key: "4K", label: "4K", sub: isPremium ? "Ultra HD" : "Premium Only", locked: !isPremium },
-  ];
+  const kind = isVideo ? "video" : "photo";
+  const options: Option[] = (["720p", "1080p", "2K", "4K"] as const).map((res) => {
+    const q = find(kind, res);
+    const locked = q ? q.locked : !isPremium && (res === "2K" || res === "4K");
+    return {
+      key: res,
+      label: res,
+      sub: locked
+        ? "Premium Only"
+        : q
+          ? `${q.remaining}/${q.limit ?? 0} left`
+          : isPremium
+            ? "Premium"
+            : "Limited",
+      locked,
+    };
+  });
 
-  const videoOptions: Option[] = [
-    { key: "720p", label: "720p", sub: isPremium ? "Premium" : "3× Daily Limit", locked: false },
-    {
-      key: "1080p",
-      label: "1080p",
-      sub: isPremium ? "Premium" : "1× / Need Premium",
-      locked: !isPremium,
-    },
-    { key: "2K", label: "2K", sub: isPremium ? "Ultra HD" : "Premium Only", locked: !isPremium },
-    { key: "4K", label: "4K", sub: isPremium ? "Ultra HD" : "Premium Only", locked: !isPremium },
-  ];
-
-  const options = isVideo ? videoOptions : photoOptions;
   const HeadingIcon = isVideo ? Video : Wand2;
   const heading = isVideo ? "Upscale Video" : "Enhance Photo";
 
