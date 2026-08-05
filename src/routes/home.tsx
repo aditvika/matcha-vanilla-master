@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 import { RequireAuth } from "@/components/require-auth";
+import { QuotaPanel } from "@/components/quota-panel";
+
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSelectedMedia } from "@/hooks/use-selected-media";
 import {
