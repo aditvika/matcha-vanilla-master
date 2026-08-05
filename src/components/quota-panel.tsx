@@ -1,5 +1,14 @@
-import { Image as ImageIcon, Video, Lock, Timer } from "lucide-react";
+import { useState } from "react";
+import { Image as ImageIcon, Video, Lock, Timer, Gauge } from "lucide-react";
 import { useQuota, useResetCountdown, type QuotaItem } from "@/hooks/use-quota";
+import { useI18n } from "@/hooks/use-i18n";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 type Row = {
   key: string;
@@ -39,7 +48,7 @@ function buildRows(tier: string, quotas: QuotaItem[]): Row[] {
   });
 }
 
-export function QuotaPanel() {
+function QuotaList() {
   const { tier, quotas, periodEnd, skewMs, loading } = useQuota();
   const countdown = useResetCountdown(periodEnd, skewMs);
 
@@ -48,14 +57,13 @@ export function QuotaPanel() {
     tier === "free" ? "Resets daily" : tier === "monthly" ? "Resets weekly" : "Resets monthly";
 
   return (
-    <section className="home-section quota-panel" aria-label="Remaining quota">
-      <div className="home-section-head">
-        <h3 className="home-section-title">Your Quota</h3>
+    <>
+      <div className="quota-modal-head">
+        <h3 className="quota-modal-title">Your Quota</h3>
         <span className="quota-reset">
           <Timer size={13} /> {cycle} · {countdown}
         </span>
       </div>
-
       <div className="quota-grid">
         {loading && rows.length === 0 ? (
           <p className="quota-empty">Loading quota…</p>
@@ -90,6 +98,36 @@ export function QuotaPanel() {
           })
         )}
       </div>
+    </>
+  );
+}
+
+export function QuotaPanel() {
+  const [open, setOpen] = useState(false);
+  const { t } = useI18n();
+
+  return (
+    <section className="quota-panel" aria-label="Remaining quota">
+      <button
+        type="button"
+        className="quota-trigger"
+        onClick={() => setOpen(true)}
+        aria-haspopup="dialog"
+      >
+        <Gauge size={16} />
+        <span>{t("home.quotaButton")}</span>
+      </button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="quota-modal-content">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{t("quota.title")}</DialogTitle>
+            <DialogDescription>{t("quota.desc")}</DialogDescription>
+          </DialogHeader>
+          <QuotaList />
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
+
