@@ -110,9 +110,9 @@ export function SubscriptionModal({
           {plans.map((plan) => (
             <div
               key={plan.title}
-              className={`sub-plan-card${plan.highlighted ? " sub-plan-card-highlighted" : ""}`}
+              className={`sub-plan-card${plan.highlighted ? " sub-plan-card-highlighted" : ""}${"sultan" in plan && plan.sultan ? " sub-plan-card-sultan" : ""}`}
             >
-              {plan.badge && <span className="sub-plan-badge">{plan.badge}</span>}
+              {plan.badge && <span className={`sub-plan-badge${"sultan" in plan && plan.sultan ? " sub-plan-badge-sultan" : ""}`}>{plan.badge}</span>}
               <h3 className="sub-plan-title">{plan.title}</h3>
               <p className="sub-plan-price">{plan.price}</p>
               <p className="sub-plan-desc" style={{ whiteSpace: "pre-line" }}>
