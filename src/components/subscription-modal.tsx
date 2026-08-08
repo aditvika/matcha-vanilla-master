@@ -23,9 +23,17 @@ const plans = [
   {
     title: "Paket Tahunan",
     price: "Rp 239.000",
-    desc: "Sistem kredit berkala maks. 800 kredit per bulan. Kredit reset setiap bulan.",
+    desc: "Sistem kredit berkala maks. 250 kredit per bulan. Kredit reset setiap bulan.",
     highlighted: true,
     badge: "Lebih Hemat!",
+  },
+  {
+    title: "Paket Tahunan VIP+ Sultan",
+    price: "Rp 350.000",
+    desc: "Sistem kredit berkala maks. 400 kredit per bulan. Kredit reset setiap bulan.",
+    highlighted: true,
+    sultan: true,
+    badge: "Sultan / Best Value!",
   },
 ];
 
