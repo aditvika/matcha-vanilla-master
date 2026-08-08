@@ -49,12 +49,23 @@ async function assertAdmin(context: AuthenticatedContext) {
   return email;
 }
 
+export type PackageType = "monthly" | "yearly" | "yearly_vip";
+
+const PACKAGE_TYPES: PackageType[] = ["monthly", "yearly", "yearly_vip"];
+
+export const PLAN_CREDITS: Record<PackageType, number> = {
+  monthly: 200,
+  yearly: 250,
+  yearly_vip: 400,
+};
+
 export const generateVouchersFn = createServerFn({ method: "POST" })
   .inputValidator(
-    (input: { quantity: number; packageType: "monthly" | "yearly" }) => {
+    (input: { quantity: number; packageType: PackageType }) => {
       const quantity = Math.max(1, Math.min(100, Math.floor(input.quantity)));
-      const packageType =
-        input.packageType === "yearly" ? "yearly" : "monthly";
+      const packageType: PackageType = PACKAGE_TYPES.includes(input.packageType)
+        ? input.packageType
+        : "monthly";
       return { quantity, packageType };
     },
   )
@@ -78,6 +89,7 @@ export const generateVouchersFn = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return inserted ?? [];
   });
+
 
 export const listVouchersFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
