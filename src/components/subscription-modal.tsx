@@ -16,14 +16,14 @@ import { usePremiumStatus } from "@/hooks/use-premium-status";
 const plans = [
   {
     title: "Paket Bulanan",
-    price: "Rp 30.000",
-    desc: "Sistem kuota berkala (FUP) maks. 50 foto & 15 video per minggu.\nKuota reset setiap minggu.",
+    price: "Rp 55.000",
+    desc: "Sistem kredit berkala maks. 200 kredit per bulan. Kredit reset setiap bulan.",
     highlighted: false,
   },
   {
     title: "Paket Tahunan",
-    price: "Rp 120.000",
-    desc: "Sistem kuota berkala (FUP) maks. 150 foto & 30 video per bulan.\nKuota reset setiap bulan.",
+    price: "Rp 239.000",
+    desc: "Sistem kredit berkala maks. 800 kredit per bulan. Kredit reset setiap bulan.",
     highlighted: true,
     badge: "Lebih Hemat!",
   },
@@ -163,7 +163,7 @@ export function SubscriptionModal({
         </div>
 
         <p className="sub-footer-note">
-          (NOTE) nominal harga bersih akhir, tidak ada tambahan apapun lagi!
+          (NOTE) Nominal harga yang tertera sudah harga akhir, dan untuk kenyamanan bersama harga akan terus di update lewat komunitas sesuai dengan pasar
         </p>
       </DialogContent>
     </Dialog>
