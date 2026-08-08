@@ -2,16 +2,28 @@ import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Copy, RefreshCw, Ticket, Shield, Check } from "lucide-react";
+import { ArrowLeft, Copy, RefreshCw, Ticket, Shield, Check, Crown } from "lucide-react";
 import { toast } from "sonner";
 import {
   generateVouchersFn,
   listVouchersFn,
   listSubscribersFn,
+  checkIsAdminFn,
+  type PackageType,
 } from "@/lib/admin-vouchers";
 import { useSupabaseSession } from "@/hooks/use-supabase-session";
 
 const ADMIN_EMAIL = "tyozxtar@gmail.com";
+
+const PACKAGES: { key: PackageType; label: string; short: string; sub: string }[] = [
+  { key: "monthly", label: "Monthly", short: "MONTHLY", sub: "200 Credits/mo" },
+  { key: "yearly", label: "Yearly", short: "YEARLY", sub: "250 Credits/mo" },
+  { key: "yearly_vip", label: "Yearly VIP+", short: "YEARLY VIP+", sub: "400 Credits/mo" },
+];
+
+function packageLabel(type: string) {
+  return PACKAGES.find((p) => p.key === type)?.short ?? type.toUpperCase();
+}
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -46,10 +58,10 @@ function AdminPage() {
   const navigate = useNavigate();
   const { session, loading } = useSupabaseSession();
   const [authorized, setAuthorized] = useState<boolean | null>(null);
-  const [packageType, setPackageType] = useState<"monthly" | "yearly">("monthly");
+  const [packageType, setPackageType] = useState<PackageType>("monthly");
   const [lastCode, setLastCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [subTab, setSubTab] = useState<"monthly" | "yearly">("monthly");
+  const [subTab, setSubTab] = useState<PackageType>("monthly");
   const qc = useQueryClient();
   const now = useNow(60_000);
 
@@ -65,7 +77,23 @@ function AdminPage() {
       navigate({ to: "/home", replace: true });
       return;
     }
-    setAuthorized(true);
+    let cancelled = false;
+    void checkIsAdminFn()
+      .then((res) => {
+        if (cancelled) return;
+        if (!res.isAdmin) {
+          toast.error("Access denied");
+          navigate({ to: "/home", replace: true });
+          return;
+        }
+        setAuthorized(true);
+      })
+      .catch(() => {
+        if (!cancelled) navigate({ to: "/home", replace: true });
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [loading, session, navigate]);
 
   const vouchersQuery = useQuery({
@@ -82,7 +110,7 @@ function AdminPage() {
   });
 
   const genMutation = useMutation({
-    mutationFn: (input: { quantity: number; packageType: "monthly" | "yearly" }) =>
+    mutationFn: (input: { quantity: number; packageType: PackageType }) =>
       generateVouchersFn({ data: input }),
     onSuccess: (rows) => {
       const code = rows[0]?.code ?? null;
@@ -138,14 +166,17 @@ function AdminPage() {
           <h2 className="home-section-title">Generate Voucher</h2>
           <div className="admin-gen-card">
             <div className="admin-pkg-select">
-              {(["monthly", "yearly"] as const).map((p) => (
+              {PACKAGES.map((p) => (
                 <button
-                  key={p}
+                  key={p.key}
                   type="button"
-                  className={`admin-pkg-opt${packageType === p ? " admin-pkg-opt-active" : ""}`}
-                  onClick={() => setPackageType(p)}
+                  className={`admin-pkg-opt${packageType === p.key ? " admin-pkg-opt-active" : ""}${p.key === "yearly_vip" ? " admin-pkg-opt-vip" : ""}`}
+                  onClick={() => setPackageType(p.key)}
                 >
-                  {p === "monthly" ? "Monthly" : "Yearly"}
+                  <span className="admin-pkg-opt-label">
+                    {p.key === "yearly_vip" && <Crown size={12} />} {p.label}
+                  </span>
+                  <span className="admin-pkg-opt-sub">{p.sub}</span>
                 </button>
               ))}
             </div>
@@ -196,14 +227,14 @@ function AdminPage() {
           </div>
 
           <div className="admin-subs-tabs">
-            {(["monthly", "yearly"] as const).map((t) => (
+            {PACKAGES.map((t) => (
               <button
-                key={t}
+                key={t.key}
                 type="button"
-                className={`lb-tab${subTab === t ? " lb-tab-active" : ""}`}
-                onClick={() => setSubTab(t)}
+                className={`lb-tab${subTab === t.key ? " lb-tab-active" : ""}`}
+                onClick={() => setSubTab(t.key)}
               >
-                {t === "monthly" ? "Monthly Subscribers" : "Yearly Subscribers"}
+                {t.label} Subscribers
               </button>
             ))}
           </div>
@@ -214,6 +245,7 @@ function AdminPage() {
                 <tr>
                   <th>User</th>
                   <th>Package</th>
+                  <th>Credits</th>
                   <th>Expires</th>
                   <th>Remaining</th>
                 </tr>
@@ -233,8 +265,12 @@ function AdminPage() {
                     </td>
                     <td>
                       <span className={`admin-pkg admin-pkg-${s.package_type}`}>
-                        {s.package_type}
+                        {s.package_type === "yearly_vip" && <Crown size={11} />}
+                        {packageLabel(s.package_type)}
                       </span>
+                    </td>
+                    <td className="admin-credits">
+                      {s.credits_remaining} / {s.credits_total}
                     </td>
                     <td className="admin-muted">
                       {s.premium_until
@@ -248,8 +284,8 @@ function AdminPage() {
                 ))}
                 {!subsQuery.isLoading && !filteredSubs.length && (
                   <tr>
-                    <td colSpan={4} className="admin-empty">
-                      No active {subTab} subscribers yet.
+                    <td colSpan={5} className="admin-empty">
+                      No active {packageLabel(subTab)} subscribers yet.
                     </td>
                   </tr>
                 )}
@@ -286,7 +322,8 @@ function AdminPage() {
                     <td className="admin-code">{v.code}</td>
                     <td>
                       <span className={`admin-pkg admin-pkg-${v.package_type}`}>
-                        {v.package_type}
+                        {v.package_type === "yearly_vip" && <Crown size={11} />}
+                        {packageLabel(v.package_type)}
                       </span>
                     </td>
                     <td>

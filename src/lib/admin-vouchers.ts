@@ -49,12 +49,23 @@ async function assertAdmin(context: AuthenticatedContext) {
   return email;
 }
 
+export type PackageType = "monthly" | "yearly" | "yearly_vip";
+
+const PACKAGE_TYPES: PackageType[] = ["monthly", "yearly", "yearly_vip"];
+
+export const PLAN_CREDITS: Record<PackageType, number> = {
+  monthly: 200,
+  yearly: 250,
+  yearly_vip: 400,
+};
+
 export const generateVouchersFn = createServerFn({ method: "POST" })
   .inputValidator(
-    (input: { quantity: number; packageType: "monthly" | "yearly" }) => {
+    (input: { quantity: number; packageType: PackageType }) => {
       const quantity = Math.max(1, Math.min(100, Math.floor(input.quantity)));
-      const packageType =
-        input.packageType === "yearly" ? "yearly" : "monthly";
+      const packageType: PackageType = PACKAGE_TYPES.includes(input.packageType)
+        ? input.packageType
+        : "monthly";
       return { quantity, packageType };
     },
   )
@@ -78,6 +89,7 @@ export const generateVouchersFn = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return inserted ?? [];
   });
+
 
 export const listVouchersFn = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -110,18 +122,24 @@ export const listSubscribersFn = createServerFn({ method: "GET" })
       "@/integrations/supabase/client.server"
     );
 
+    const nowIso = new Date().toISOString();
+
     // Get active premium profiles
     const { data: profiles, error: pErr } = await supabaseAdmin
       .from("profiles")
-      .select("id, email, display_name, is_premium, premium_until")
+      .select("id, email, display_name, is_premium, premium_until, package_type")
       .eq("is_premium", true)
-      .gt("premium_until", new Date().toISOString())
+      .gt("premium_until", nowIso)
       .order("premium_until", { ascending: true });
     if (pErr) throw new Error(pErr.message);
 
-    // Determine package via most recent used voucher per user
     const ids = (profiles ?? []).map((p) => p.id);
-    let pkgMap = new Map<string, "monthly" | "yearly">();
+
+    // Fallback package via most recent used voucher per user
+    const pkgMap = new Map<string, PackageType>();
+    // Credits used in the current active window
+    const usedMap = new Map<string, number>();
+
     if (ids.length) {
       const { data: vs, error: vErr } = await supabaseAdmin
         .from("vouchers")
@@ -131,16 +149,36 @@ export const listSubscribersFn = createServerFn({ method: "GET" })
       if (vErr) throw new Error(vErr.message);
       for (const v of vs ?? []) {
         if (v.used_by && !pkgMap.has(v.used_by)) {
-          pkgMap.set(v.used_by, v.package_type as "monthly" | "yearly");
+          pkgMap.set(v.used_by, v.package_type as PackageType);
         }
+      }
+
+      const { data: usage, error: uErr } = await supabaseAdmin
+        .from("quota_usage")
+        .select("user_id, used_count, period_end")
+        .in("user_id", ids)
+        .gt("period_end", nowIso);
+      if (uErr) throw new Error(uErr.message);
+      for (const u of usage ?? []) {
+        usedMap.set(u.user_id, (usedMap.get(u.user_id) ?? 0) + (u.used_count ?? 0));
       }
     }
 
-    return (profiles ?? []).map((p) => ({
-      id: p.id,
-      email: p.email,
-      display_name: p.display_name,
-      premium_until: p.premium_until,
-      package_type: pkgMap.get(p.id) ?? "monthly",
-    }));
+    return (profiles ?? []).map((p) => {
+      const packageType: PackageType =
+        (p.package_type as PackageType | null) ?? pkgMap.get(p.id) ?? "monthly";
+      const total = PLAN_CREDITS[packageType] ?? PLAN_CREDITS.monthly;
+      const used = usedMap.get(p.id) ?? 0;
+      return {
+        id: p.id,
+        email: p.email,
+        display_name: p.display_name,
+        premium_until: p.premium_until,
+        package_type: packageType,
+        credits_total: total,
+        credits_used: used,
+        credits_remaining: Math.max(total - used, 0),
+      };
+    });
   });
+
