@@ -23,9 +23,17 @@ const plans = [
   {
     title: "Paket Tahunan",
     price: "Rp 239.000",
-    desc: "Sistem kredit berkala maks. 800 kredit per bulan. Kredit reset setiap bulan.",
+    desc: "Sistem kredit berkala maks. 250 kredit per bulan. Kredit reset setiap bulan.",
     highlighted: true,
     badge: "Lebih Hemat!",
+  },
+  {
+    title: "Paket Tahunan VIP+ Sultan",
+    price: "Rp 350.000",
+    desc: "Sistem kredit berkala maks. 400 kredit per bulan. Kredit reset setiap bulan.",
+    highlighted: true,
+    sultan: true,
+    badge: "Sultan / Best Value!",
   },
 ];
 
@@ -102,9 +110,9 @@ export function SubscriptionModal({
           {plans.map((plan) => (
             <div
               key={plan.title}
-              className={`sub-plan-card${plan.highlighted ? " sub-plan-card-highlighted" : ""}`}
+              className={`sub-plan-card${plan.highlighted ? " sub-plan-card-highlighted" : ""}${"sultan" in plan && plan.sultan ? " sub-plan-card-sultan" : ""}`}
             >
-              {plan.badge && <span className="sub-plan-badge">{plan.badge}</span>}
+              {plan.badge && <span className={`sub-plan-badge${"sultan" in plan && plan.sultan ? " sub-plan-badge-sultan" : ""}`}>{plan.badge}</span>}
               <h3 className="sub-plan-title">{plan.title}</h3>
               <p className="sub-plan-price">{plan.price}</p>
               <p className="sub-plan-desc" style={{ whiteSpace: "pre-line" }}>
