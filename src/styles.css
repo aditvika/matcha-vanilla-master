@@ -1182,6 +1182,15 @@
 .sub-plan-card-highlighted:hover {
   border-color: oklch(0.75 0.16 145 / 0.7);
 }
+.sub-plan-card-sultan {
+  background: linear-gradient(135deg, oklch(0.8 0.15 65 / 0.14), oklch(0.7 0.18 300 / 0.1));
+  border: 1.5px solid oklch(0.8 0.15 65 / 0.55);
+  box-shadow: 0 0 0 1px oklch(0.8 0.15 65 / 0.18), 0 6px 20px -6px oklch(0.8 0.15 65 / 0.25);
+}
+.sub-plan-card-sultan:hover {
+  border-color: oklch(0.85 0.16 65 / 0.85);
+  background: linear-gradient(135deg, oklch(0.8 0.15 65 / 0.2), oklch(0.7 0.18 300 / 0.14));
+}
 .sub-plan-badge {
   position: absolute;
   top: -0.5rem;
@@ -1193,6 +1202,12 @@
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+}
+.sub-plan-badge-sultan {
+  background: linear-gradient(135deg, oklch(0.85 0.15 65), oklch(0.72 0.16 30));
+  color: oklch(0.2 0.02 60);
+  white-space: nowrap;
+  font-size: 0.62rem;
 }
 .sub-plan-title {
   margin: 0;
