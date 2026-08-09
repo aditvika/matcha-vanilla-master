@@ -52,16 +52,18 @@ function PreviewPage() {
   const isVideo = media.kind === "video";
 
   const kind = isVideo ? "video" : "photo";
+  const pool = poolFor(kind);
   const options: Option[] = (["720p", "1080p", "2K", "4K"] as const).map((res) => {
-    const q = find(kind, res);
-    const locked = q ? q.locked : !isPremium && (res === "2K" || res === "4K");
+    const rate = findRate(kind, res);
+    const locked = rate ? rate.locked : !isPremium && (res === "2K" || res === "4K");
+    const cost = rate?.cost ?? null;
     return {
       key: res,
       label: res,
       sub: locked
         ? "Premium Only"
-        : q
-          ? `${q.remaining}/${q.limit ?? 0} left`
+        : cost !== null
+          ? `${cost} credit${cost > 1 ? "s" : ""} · ${pool?.remaining ?? 0} left`
           : isPremium
             ? "Premium"
             : "Limited",
