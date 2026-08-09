@@ -94,18 +94,19 @@ function PreviewPage() {
     try {
       const kind = isVideo ? "video" : "photo";
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.rpc as any)("consume_quota", {
+      const { data, error } = await (supabase.rpc as any)("consume_credits", {
         p_kind: kind,
         p_resolution: selected,
       });
       if (error) {
-        toast.error("Could not verify your quota. Please try again.");
+        toast.error("Could not verify your credits. Please try again.");
         setProcessing(false);
         return;
       }
       const res = data as {
         success: boolean;
         reason?: string;
+        cost?: number;
         limit?: number;
         remaining?: number;
         period_end?: string;
@@ -115,9 +116,7 @@ function PreviewPage() {
           setPremiumOpen(true);
         } else {
           toast.error(
-            isVideo
-              ? `Video quota used up (${res?.limit ?? 0} per period). Upgrade or redeem a voucher for more.`
-              : `Photo quota used up (${res?.limit ?? 0} per period). Upgrade or redeem a voucher for more.`,
+            `Not enough credits (need ${res?.cost ?? 1}, ${res?.remaining ?? 0} left). Upgrade or redeem a voucher for more.`,
             {
               duration: 6000,
               action: { label: "Upgrade", onClick: () => setSubOpen(true) },
@@ -127,7 +126,7 @@ function PreviewPage() {
         setProcessing(false);
         return;
       }
-      void refreshQuota();
+      void refreshCredits();
       void navigate({ to: "/processing", search: { resolution: selected } });
 
     } catch {
