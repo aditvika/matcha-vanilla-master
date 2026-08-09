@@ -4,7 +4,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Lock, Sparkles, Wand2, Video } from "lucide-react";
 import { useSelectedMedia } from "@/hooks/use-selected-media";
 import { usePremiumStatus } from "@/hooks/use-premium-status";
-import { useQuota } from "@/hooks/use-quota";
+import { useCredits } from "@/hooks/use-credits";
 
 import { PremiumModal } from "@/components/premium-modal";
 import { SubscriptionModal } from "@/components/subscription-modal";
@@ -35,7 +35,7 @@ type Option = {
 function PreviewPage() {
   const { media, clear } = useSelectedMedia();
   const { isPremium } = usePremiumStatus();
-  const { find, refresh: refreshQuota } = useQuota();
+  const { findRate, poolFor, refresh: refreshCredits } = useCredits();
 
   const navigate = useNavigate();
   const [premiumOpen, setPremiumOpen] = useState(false);
@@ -52,16 +52,18 @@ function PreviewPage() {
   const isVideo = media.kind === "video";
 
   const kind = isVideo ? "video" : "photo";
+  const pool = poolFor(kind);
   const options: Option[] = (["720p", "1080p", "2K", "4K"] as const).map((res) => {
-    const q = find(kind, res);
-    const locked = q ? q.locked : !isPremium && (res === "2K" || res === "4K");
+    const rate = findRate(kind, res);
+    const locked = rate ? rate.locked : !isPremium && (res === "2K" || res === "4K");
+    const cost = rate?.cost ?? null;
     return {
       key: res,
       label: res,
       sub: locked
         ? "Premium Only"
-        : q
-          ? `${q.remaining}/${q.limit ?? 0} left`
+        : cost !== null
+          ? `${cost} credit${cost > 1 ? "s" : ""} · ${pool?.remaining ?? 0} left`
           : isPremium
             ? "Premium"
             : "Limited",
@@ -92,18 +94,19 @@ function PreviewPage() {
     try {
       const kind = isVideo ? "video" : "photo";
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase.rpc as any)("consume_quota", {
+      const { data, error } = await (supabase.rpc as any)("consume_credits", {
         p_kind: kind,
         p_resolution: selected,
       });
       if (error) {
-        toast.error("Could not verify your quota. Please try again.");
+        toast.error("Could not verify your credits. Please try again.");
         setProcessing(false);
         return;
       }
       const res = data as {
         success: boolean;
         reason?: string;
+        cost?: number;
         limit?: number;
         remaining?: number;
         period_end?: string;
@@ -113,9 +116,7 @@ function PreviewPage() {
           setPremiumOpen(true);
         } else {
           toast.error(
-            isVideo
-              ? `Video quota used up (${res?.limit ?? 0} per period). Upgrade or redeem a voucher for more.`
-              : `Photo quota used up (${res?.limit ?? 0} per period). Upgrade or redeem a voucher for more.`,
+            `Not enough credits (need ${res?.cost ?? 1}, ${res?.remaining ?? 0} left). Upgrade or redeem a voucher for more.`,
             {
               duration: 6000,
               action: { label: "Upgrade", onClick: () => setSubOpen(true) },
@@ -125,7 +126,7 @@ function PreviewPage() {
         setProcessing(false);
         return;
       }
-      void refreshQuota();
+      void refreshCredits();
       void navigate({ to: "/processing", search: { resolution: selected } });
 
     } catch {

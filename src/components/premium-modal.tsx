@@ -25,33 +25,45 @@ export function PremiumModal({ open, onOpenChange, onUnderstand }: { open: boole
               </p>
 
               <p className="premium-modal-line">
-                Perlu diketahui, saat ini aplikasi MVMaster masih berada dalam tahap awal rilis{" "}
-                <strong>(Early Stage)</strong>. Kami berkomitmen penuh untuk selalu memberikan hasil up-scaling AI yang{" "}
+                Perlu diketahui, saat ini aplikasi MVMaster masih berada dalam tahap{" "}
+                <strong>pengembangan aktif</strong>. Kami berkomitmen penuh untuk selalu memberikan hasil up-scaling AI yang{" "}
                 <strong>nyata, jujur, dan berkualitas tinggi</strong> tanpa iming-iming palsu.
               </p>
 
               <p className="premium-modal-line">
-                Karena proses AI HD ini membutuhkan komputasi awan (cloud server) yang murni online dan memakan biaya
-                operasional mandiri, untuk saat ini akun Premium terpaksa kami batasi dengan sistem kuota berkala{" "}
-                <strong>(FUP)</strong> demi menjaga kestabilan server agar tidak jebol dan performanya tetap adil bagi
-                semua pengguna.
+                Karena proses AI HD ini membutuhkan komputasi awan (cloud server) yang murni online serta memakan biaya
+                operasional mandiri, saat ini akun Premium kami jalankan dengan{" "}
+                <strong>Sistem Kredit Berkala</strong> demi menjaga kestabilan server agar performanya tetap optimal dan
+                adil bagi semua pengguna:
               </p>
 
               <ul className="premium-modal-list">
                 <li>
-                  <strong>Paket Bulanan:</strong> Akses Premium dengan kuota aman maksimal{" "}
-                  <strong>50 foto &amp; 15 video per minggu</strong> (reset otomatis tiap minggu sesuai masa aktif).
+                  <strong>Paket Bulanan:</strong> Akses Premium dengan alokasi maksimal{" "}
+                  <strong>200 Kredit per bulan</strong> (reset otomatis tiap bulan).
                 </li>
                 <li>
-                  <strong>Paket Tahunan:</strong> Akses Premium dengan kuota aman maksimal{" "}
-                  <strong>150 foto &amp; 30 video per bulan</strong> (reset otomatis tiap bulan).
+                  <strong>Paket Tahunan:</strong> Akses Premium dengan alokasi maksimal{" "}
+                  <strong>250 Kredit per bulan</strong> (reset otomatis tiap bulan).
+                </li>
+                <li>
+                  <strong>Paket Tahunan VIP+:</strong> Akses Premium dengan alokasi maksimal{" "}
+                  <strong>400 Kredit per bulan</strong> (reset otomatis tiap bulan).
                 </li>
               </ul>
 
               <p className="premium-modal-line">
-                Kami sangat mengharapkan pemahaman dan kerja sama dari teman-teman semua. Setiap rupiah yang kamu
-                keluarkan untuk langganan saat ini akan langsung diputar kembali untuk upgrade kapasitas server yang
-                lebih besar, perbaikan bug, serta penambahan fitur-fitur baru ke depannya sesuai request kalian.
+                <strong>Ketentuan Pemakaian Kredit Premium:</strong>
+              </p>
+              <ul className="premium-modal-list">
+                <li>Foto HD / 2K: 1 Kredit | Foto Ultra 4K: 2 Kredit</li>
+                <li>Video HD: 5 Kredit | Video Ultra 2K/4K: 10 Kredit</li>
+              </ul>
+
+              <p className="premium-modal-line">
+                Kami sangat mengharapkan pemahaman dan kerja sama dari teman-teman semua. Setiap dukungan dari kamu akan
+                langsung diputar kembali untuk peningkatan kapasitas server, optimalisasi sistem, serta penambahan
+                fitur-fitur baru ke depannya sesuai masukan komunitas.
               </p>
 
               <p className="premium-modal-line">

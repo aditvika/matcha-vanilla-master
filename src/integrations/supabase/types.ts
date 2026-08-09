@@ -137,11 +137,24 @@ export type Database = {
     }
     Functions: {
       claim_voucher: { Args: { p_code: string }; Returns: Json }
+      consume_credits: {
+        Args: { p_kind: string; p_resolution: string }
+        Returns: Json
+      }
       consume_daily_credit: { Args: { p_kind: string }; Returns: Json }
       consume_quota: {
         Args: { p_kind: string; p_resolution: string }
         Returns: Json
       }
+      credit_rule: {
+        Args: { _kind: string; _resolution: string; _tier: string }
+        Returns: {
+          bucket: string
+          cost: number
+          pool_max: number
+        }[]
+      }
+      get_credit_status: { Args: never; Returns: Json }
       get_quota_status: { Args: never; Returns: Json }
       get_server_date: { Args: never; Returns: string }
       quota_limit: {
