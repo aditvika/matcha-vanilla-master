@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Image as ImageIcon, Video, Lock, Timer, Gauge } from "lucide-react";
-import { useQuota, useResetCountdown, type QuotaItem } from "@/hooks/use-quota";
+import { Image as ImageIcon, Video, Timer, Gauge, Crown, Sparkles } from "lucide-react";
+import { useCredits, useResetCountdown } from "@/hooks/use-credits";
 import { useI18n } from "@/hooks/use-i18n";
+import { SubscriptionModal } from "@/components/subscription-modal";
 import {
   Dialog,
   DialogContent,
@@ -10,104 +11,139 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-type Row = {
-  key: string;
-  label: string;
-  kind: "photo" | "video";
-  locked: boolean;
-  used: number;
-  limit: number | null;
-  remaining: number;
+const TIER_LABEL: Record<string, string> = {
+  free: "Free",
+  monthly: "Premium Bulanan",
+  yearly: "Premium Tahunan",
+  yearly_vip: "Premium Tahunan VIP+",
 };
 
-function buildRows(tier: string, quotas: QuotaItem[]): Row[] {
-  if (tier === "free") {
-    return quotas
-      .filter((q) => ["720p", "1080p"].includes(q.resolution) || q.locked)
-      .map((q) => ({
-        key: `${q.kind}-${q.resolution}`,
-        label: `${q.kind === "photo" ? "Photo" : "Video"} ${q.resolution}`,
-        kind: q.kind,
-        locked: q.locked,
-        used: q.used,
-        limit: q.limit,
-        remaining: q.remaining,
-      }));
-  }
-  return (["photo", "video"] as const).map((kind) => {
-    const q = quotas.find((x) => x.kind === kind);
-    return {
-      key: kind,
-      label: kind === "photo" ? "Photo (720p–4K)" : "Video (720p–4K)",
-      kind,
-      locked: false,
-      used: q?.used ?? 0,
-      limit: q?.limit ?? 0,
-      remaining: q?.remaining ?? 0,
-    };
-  });
-}
-
-function QuotaList() {
-  const { tier, quotas, periodEnd, skewMs, loading } = useQuota();
+function CreditList({ onUpgrade }: { onUpgrade: () => void }) {
+  const { tier, pools, rates, periodEnd, skewMs, loading } = useCredits();
   const countdown = useResetCountdown(periodEnd, skewMs);
+  const isFree = tier === "free";
 
-  const rows = buildRows(tier, quotas);
-  const cycle =
-    tier === "free" ? "Resets daily" : tier === "monthly" ? "Resets weekly" : "Resets monthly";
+  const cycle = isFree ? "Resets daily (24h)" : "Resets monthly";
+
+  const photo = pools.find((p) => p.key === "photo");
+  const video = pools.find((p) => p.key === "video");
+  const unified = pools.find((p) => p.key === "credits");
+
+  const bar = (used: number, limit: number) =>
+    limit > 0 ? Math.min(100, (used / limit) * 100) : 0;
+
+  const rateRows = isFree
+    ? [
+        { label: "Photo (720p – 1080p)", cost: "1 Credit" },
+        { label: "Video (720p)", cost: "3 Credits" },
+      ]
+    : [
+        { label: "Photo (720p – 2K)", cost: "1 Credit" },
+        { label: "Photo Ultra (4K)", cost: "2 Credits" },
+        { label: "Video HD (720p – 1080p)", cost: "5 Credits" },
+        { label: "Video Ultra (2K – 4K)", cost: "10 Credits" },
+      ];
 
   return (
     <>
       <div className="quota-modal-head">
-        <h3 className="quota-modal-title">Your Quota</h3>
+        <h3 className="quota-modal-title">Your Credits</h3>
         <span className="quota-reset">
           <Timer size={13} /> {cycle} · {countdown}
         </span>
       </div>
+
+      <span className="credit-tier-chip">
+        {!isFree && <Crown size={12} />} {TIER_LABEL[tier] ?? tier}
+      </span>
+
       <div className="quota-grid">
-        {loading && rows.length === 0 ? (
-          <p className="quota-empty">Loading quota…</p>
-        ) : (
-          rows.map((r) => {
-            const pct =
-              r.limit && r.limit > 0 ? Math.min(100, (r.used / r.limit) * 100) : 0;
-            return (
-              <div key={r.key} className={`quota-item ${r.locked ? "quota-item-locked" : ""}`}>
-                <div className="quota-item-top">
-                  <span className="quota-item-label">
-                    {r.kind === "photo" ? <ImageIcon size={14} /> : <Video size={14} />}
-                    {r.label}
-                  </span>
-                  {r.locked ? (
-                    <span className="quota-item-lock">
-                      <Lock size={12} /> Premium
-                    </span>
-                  ) : (
-                    <span className="quota-item-count">
-                      {r.remaining}/{r.limit ?? 0}
-                    </span>
-                  )}
-                </div>
-                {!r.locked && (
-                  <div className="quota-bar" aria-hidden>
-                    <span style={{ width: `${pct}%` }} />
-                  </div>
-                )}
+        {loading && pools.length === 0 ? (
+          <p className="quota-empty">Loading credits…</p>
+        ) : isFree ? (
+          <>
+            <div className="quota-item">
+              <div className="quota-item-top">
+                <span className="quota-item-label">
+                  <ImageIcon size={14} /> Photo Credits
+                </span>
+                <span className="quota-item-count">
+                  {photo?.remaining ?? 0}/{photo?.limit ?? 5}
+                </span>
               </div>
-            );
-          })
+              <div className="quota-bar" aria-hidden>
+                <span style={{ width: `${bar(photo?.used ?? 0, photo?.limit ?? 5)}%` }} />
+              </div>
+            </div>
+            <div className="quota-item">
+              <div className="quota-item-top">
+                <span className="quota-item-label">
+                  <Video size={14} /> Video Credits
+                </span>
+                <span className="quota-item-count">
+                  {video?.remaining ?? 0}/{video?.limit ?? 9}
+                </span>
+              </div>
+              <div className="quota-bar" aria-hidden>
+                <span style={{ width: `${bar(video?.used ?? 0, video?.limit ?? 9)}%` }} />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="quota-item credit-item-unified">
+            <div className="quota-item-top">
+              <span className="quota-item-label">
+                <Sparkles size={14} /> Total Credits
+              </span>
+              <span className="quota-item-count">
+                {unified?.remaining ?? 0} / {unified?.limit ?? 0} Credits
+              </span>
+            </div>
+            <div className="quota-bar" aria-hidden>
+              <span style={{ width: `${bar(unified?.used ?? 0, unified?.limit ?? 0)}%` }} />
+            </div>
+          </div>
         )}
       </div>
+
+      <div className="credit-rate-card">
+        <p className="credit-rate-title">Rate Breakdown</p>
+        <ul className="credit-rate-list">
+          {rateRows.map((r) => (
+            <li key={r.label}>
+              <span>{r.label}</span>
+              <strong>{r.cost}</strong>
+            </li>
+          ))}
+        </ul>
+        {isFree && (
+          <p className="credit-rate-note">
+            2K &amp; 4K locked on Free · Video limited to 720p
+          </p>
+        )}
+        {!isFree && rates.length === 0 && null}
+      </div>
+
+      {isFree && (
+        <button type="button" className="credit-upgrade-banner" onClick={onUpgrade}>
+          <Crown size={16} />
+          <span>
+            <strong>Upgrade to Premium</strong>
+            <em>Up to 400 credits/month, 2K &amp; 4K unlocked</em>
+          </span>
+        </button>
+      )}
     </>
   );
 }
 
 export function QuotaPanel() {
   const [open, setOpen] = useState(false);
+  const [subOpen, setSubOpen] = useState(false);
   const { t } = useI18n();
 
   return (
-    <section className="quota-panel" aria-label="Remaining quota">
+    <section className="quota-panel" aria-label="Remaining credits">
       <button
         type="button"
         className="quota-trigger"
@@ -124,10 +160,16 @@ export function QuotaPanel() {
             <DialogTitle>{t("quota.title")}</DialogTitle>
             <DialogDescription>{t("quota.desc")}</DialogDescription>
           </DialogHeader>
-          <QuotaList />
+          <CreditList
+            onUpgrade={() => {
+              setOpen(false);
+              setTimeout(() => setSubOpen(true), 220);
+            }}
+          />
         </DialogContent>
       </Dialog>
+
+      <SubscriptionModal open={subOpen} onOpenChange={setSubOpen} />
     </section>
   );
 }
-
