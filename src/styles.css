@@ -149,15 +149,22 @@
   min-height: 100vh;
   width: 100%;
   overflow: hidden;
-  background-color: oklch(0.24 0.025 240);
+  background-color: oklch(0.24 0.02 270);
   color: oklch(0.96 0.005 90);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 6rem 1.5rem 3rem;
+  justify-content: center;
+  padding: 0;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+.splash-image {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
 
 .splash-glow {
   position: absolute;
