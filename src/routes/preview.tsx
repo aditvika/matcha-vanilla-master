@@ -35,7 +35,7 @@ type Option = {
 function PreviewPage() {
   const { media, clear } = useSelectedMedia();
   const { isPremium } = usePremiumStatus();
-  const { find, refresh: refreshQuota } = useQuota();
+  const { findRate, poolFor, refresh: refreshCredits } = useCredits();
 
   const navigate = useNavigate();
   const [premiumOpen, setPremiumOpen] = useState(false);
