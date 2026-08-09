@@ -1,0 +1,134 @@
+import { useCallback, useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useSupabaseSession } from "@/hooks/use-supabase-session";
+
+export type CreditTier = "free" | "monthly" | "yearly" | "yearly_vip";
+
+export type CreditPool = {
+  key: string;
+  kind: "photo" | "video" | "all";
+  limit: number;
+  used: number;
+  remaining: number;
+};
+
+export type CreditRate = {
+  kind: "photo" | "video";
+  resolution: "720p" | "1080p" | "2K" | "4K";
+  locked: boolean;
+  cost: number | null;
+};
+
+export type CreditStatus = {
+  tier: CreditTier;
+  serverTime: string | null;
+  periodStart: string | null;
+  periodEnd: string | null;
+  pools: CreditPool[];
+  rates: CreditRate[];
+};
+
+const EMPTY: CreditStatus = {
+  tier: "free",
+  serverTime: null,
+  periodStart: null,
+  periodEnd: null,
+  pools: [],
+  rates: [],
+};
+
+/**
+ * Credit state is fully server-driven: pools, costs and the reset window all
+ * come from the database clock, so changing the device date has no effect.
+ */
+export function useCredits() {
+  const { user } = useSupabaseSession();
+  const [status, setStatus] = useState<CreditStatus>(EMPTY);
+  const [loading, setLoading] = useState(true);
+  /** Milliseconds of drift between the device clock and the server clock. */
+  const [skewMs, setSkewMs] = useState(0);
+
+  const refresh = useCallback(async () => {
+    if (!user) {
+      setStatus(EMPTY);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)("get_credit_status");
+    if (!error && data) {
+      const d = data as Record<string, unknown>;
+      const serverTime = (d.server_time as string) ?? null;
+      if (serverTime) setSkewMs(new Date(serverTime).getTime() - Date.now());
+      setStatus({
+        tier: (d.tier as CreditTier) ?? "free",
+        serverTime,
+        periodStart: (d.period_start as string) ?? null,
+        periodEnd: (d.period_end as string) ?? null,
+        pools: ((d.pools as CreditPool[]) ?? []).map((p) => ({
+          ...p,
+          limit: Number(p.limit ?? 0),
+          used: Number(p.used ?? 0),
+          remaining: Number(p.remaining ?? 0),
+        })),
+        rates: ((d.rates as CreditRate[]) ?? []).map((r) => ({
+          ...r,
+          cost: r.cost === null || r.cost === undefined ? null : Number(r.cost),
+        })),
+      });
+    }
+    setLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  const findRate = useCallback(
+    (kind: CreditRate["kind"], resolution: CreditRate["resolution"]) =>
+      status.rates.find((r) => r.kind === kind && r.resolution === resolution) ?? null,
+    [status.rates],
+  );
+
+  const poolFor = useCallback(
+    (kind: "photo" | "video") =>
+      status.tier === "free"
+        ? (status.pools.find((p) => p.key === kind) ?? null)
+        : (status.pools.find((p) => p.key === "credits") ?? null),
+    [status.pools, status.tier],
+  );
+
+  return { ...status, skewMs, loading, refresh, findRate, poolFor };
+}
+
+/** Countdown until the server-side reset, corrected for device clock drift. */
+export function useResetCountdown(periodEnd: string | null, skewMs: number) {
+  const [label, setLabel] = useState("--");
+
+  useEffect(() => {
+    if (!periodEnd) {
+      setLabel("--");
+      return;
+    }
+    const tick = () => {
+      const diff = new Date(periodEnd).getTime() - (Date.now() + skewMs);
+      if (diff <= 0) {
+        setLabel("0d 00:00:00");
+        return;
+      }
+      const s = Math.floor(diff / 1000);
+      const d = Math.floor(s / 86400);
+      const h = Math.floor((s % 86400) / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      const pad = (n: number) => String(n).padStart(2, "0");
+      setLabel(`${d}d ${pad(h)}:${pad(m)}:${pad(sec)}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [periodEnd, skewMs]);
+
+  return label;
+}
