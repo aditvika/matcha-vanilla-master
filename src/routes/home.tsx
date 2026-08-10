@@ -107,7 +107,8 @@ const notifications: Notification[] = [
   },
 ];
 
-import { leaderboardFull, getInitials, type LeaderTab } from "@/lib/leaderboard-data";
+import { getInitials, type LeaderTab } from "@/lib/leaderboard-data";
+
 const rankMeta = [
   { Icon: Crown, cls: "lb-rank-gold" },
   { Icon: Medal, cls: "lb-rank-silver" },
