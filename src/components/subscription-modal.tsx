@@ -67,9 +67,11 @@ export function SubscriptionModal({
     }
     setClaiming(true);
     try {
+      // 1. Klaim voucher via RPC
       const { data, error } = await supabase.rpc("claim_voucher", {
         p_code: trimmed,
       });
+
       if (error) {
         if (error.message.includes("NOT_AUTHENTICATED")) {
           toast.error("Silakan masuk terlebih dahulu");
@@ -78,9 +80,44 @@ export function SubscriptionModal({
         }
         return;
       }
+
       const payload = data as { package_type?: string; premium_until?: string } | null;
-      const pkg = payload?.package_type === "yearly" ? "Tahunan" : "Bulanan";
-      toast.success(`Premium ${pkg} berhasil diaktifkan 🎉`);
+      const pkgType = payload?.package_type || "monthly";
+
+      // 2. Hitung Poin MVP berdasarkan Paket:
+      // Bulanan = +2, Tahunan Hemat = +3, VIP+ Sultan = +5
+      let mvpToAdd = 2;
+      let pkgName = "Bulanan";
+
+      if (pkgType === "yearly_vip" || pkgType === "sultan") {
+        mvpToAdd = 5;
+        pkgName = "Tahunan VIP+ Sultan";
+      } else if (pkgType === "yearly") {
+        mvpToAdd = 3;
+        pkgName = "Tahunan Hemat";
+      }
+
+      // 3. Ambil nilai MVP saat ini dari profil user
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("mvp_points")
+        .eq("id", user.id)
+        .single();
+
+      const currentMvp = profile?.mvp_points || 0;
+      const newMvp = currentMvp + mvpToAdd;
+
+      // 4. Update profil pengguna di database (Auto Push ke Leaderboard)
+      await supabase
+        .from("profiles")
+        .update({
+          plan_type: pkgType,
+          mvp_points: newMvp,
+          email: user.email,
+        })
+        .eq("id", user.id);
+
+      toast.success(`Premium ${pkgName} berhasil diaktifkan! (+${mvpToAdd} MVP Poin) 🎉`);
       setCode("");
       await refreshPremium();
       onOpenChange(false);
