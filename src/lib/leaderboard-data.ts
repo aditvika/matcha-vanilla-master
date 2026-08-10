@@ -8,14 +8,12 @@ export type LeaderEntry = {
   mvp: number;
 };
 
-// Ambil display name dari email Google (karakter sebelum @)
 export function getDisplayNameFromEmail(email?: string | null): string {
   if (!email) return "Pengguna";
   const namePart = email.split("@")[0];
   return namePart || "Pengguna";
 }
 
-// Ambil inisial untuk Avatar
 export function getInitials(name: string) {
   return name
     .replace(/[_\s.]+/g, " ")
@@ -27,11 +25,10 @@ export function getInitials(name: string) {
     .toUpperCase();
 }
 
-// Fetch Leaderboard secara dinamis dari Supabase
 export async function fetchLeaderboardData(): Promise<Record<LeaderTab, LeaderEntry[]>> {
   try {
-    const { data, error } = await supabase
-      .from("profiles")
+    const { data, error } = await (supabase
+      .from("profiles") as any)
       .select("email, full_name, plan_type, mvp_points")
       .gt("mvp_points", 0)
       .order("mvp_points", { ascending: false });
@@ -44,8 +41,7 @@ export async function fetchLeaderboardData(): Promise<Record<LeaderTab, LeaderEn
     const tahunanList: LeaderEntry[] = [];
     const mixList: LeaderEntry[] = [];
 
-    data.forEach((row) => {
-      // Ambil username dari email
+    (data as any[]).forEach((row) => {
       const name = getDisplayNameFromEmail(row.email || row.full_name);
       const points = row.mvp_points || 0;
       const pkg = row.plan_type || "monthly";
@@ -63,14 +59,12 @@ export async function fetchLeaderboardData(): Promise<Record<LeaderTab, LeaderEn
         mvp: points,
       };
 
-      // Filter berdasarkan Tab
       if (displayTier === "Bulanan") {
         bulananList.push(entry);
       } else if (displayTier === "Tahunan" || displayTier === "VIP+") {
         tahunanList.push(entry);
       }
 
-      // Mix berisi semua entitas
       mixList.push(entry);
     });
 
