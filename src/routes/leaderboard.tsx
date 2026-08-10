@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RequireAuth } from "@/components/require-auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Crown, Medal, Award, Trophy } from "lucide-react";
-import { leaderboardFull, getInitials, type LeaderTab } from "@/lib/leaderboard-data";
+import { ArrowLeft, Crown, Medal, Award, Trophy, Loader2 } from "lucide-react";
+import {
+  fetchLeaderboardData,
+  getInitials,
+  type LeaderTab,
+  type LeaderEntry,
+} from "@/lib/leaderboard-data";
 
 type Search = { tab?: LeaderTab };
 
@@ -10,7 +15,7 @@ export const Route = createFileRoute("/leaderboard")({
   head: () => ({
     meta: [
       { title: "Premium Leaderboard — MVMaster" },
-      { name: "description", content: "Top 20 ranking of MVMaster premium members." },
+      { name: "description", content: "Top ranking of MVMaster premium members." },
     ],
   }),
   validateSearch: (s: Record<string, unknown>): Search => {
@@ -34,6 +39,30 @@ function rankMeta(i: number) {
 function LeaderboardPage() {
   const { tab } = Route.useSearch();
   const [leaderTab, setLeaderTab] = useState<LeaderTab>(tab ?? "Bulanan");
+  const [data, setData] = useState<Record<LeaderTab, LeaderEntry[]>>({
+    Bulanan: [],
+    Tahunan: [],
+    Mix: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadData() {
+      setLoading(true);
+      const res = await fetchLeaderboardData();
+      if (isMounted) {
+        setData(res);
+        setLoading(false);
+      }
+    }
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const currentList = data[leaderTab] || [];
 
   return (
     <main className="home-root">
@@ -67,29 +96,39 @@ function LeaderboardPage() {
             ))}
           </div>
 
-          <ul className="lb-list">
-            {[...leaderboardFull[leaderTab]]
-              .sort((a, b) => b.mvp - a.mvp)
-              .slice(0, 20)
-              .map((entry, i) => {
-              const { Icon, cls } = rankMeta(i);
-              const initials = getInitials(entry.name);
-              return (
-                <li key={entry.name} className="lb-row">
-                  <div className={`lb-rank ${cls}`}>
-                    <Icon size={18} />
-                    <span className="lb-rank-num">{i + 1}</span>
-                  </div>
-                  <div className="lb-avatar" aria-hidden>{initials}</div>
-                  <div className="lb-user">
-                    <p className="lb-name">{entry.name}</p>
-                    <span className="lb-tier">{entry.tier}</span>
-                  </div>
-                  <span className="lb-score">{entry.mvp} MVP</span>
-                </li>
-              );
-            })}
-          </ul>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <Loader2 size={24} className="animate-spin mb-2" />
+              <p>Memuat Top Leaderboard...</p>
+            </div>
+          ) : currentList.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>Belum ada pengguna di kategori ini.</p>
+            </div>
+          ) : (
+            <ul className="lb-list">
+              {currentList.slice(0, 50).map((entry, i) => {
+                const { Icon, cls } = rankMeta(i);
+                const initials = getInitials(entry.name);
+                return (
+                  <li key={`${entry.name}-${i}`} className="lb-row">
+                    <div className={`lb-rank ${cls}`}>
+                      <Icon size={18} />
+                      <span className="lb-rank-num">{i + 1}</span>
+                    </div>
+                    <div className="lb-avatar" aria-hidden>
+                      {initials}
+                    </div>
+                    <div className="lb-user">
+                      <p className="lb-name">{entry.name}</p>
+                      <span className="lb-tier">{entry.tier}</span>
+                    </div>
+                    <span className="lb-score">{entry.mvp} MVP</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
       </div>
     </main>
